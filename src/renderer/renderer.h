@@ -48,6 +48,12 @@ public:
 #endif
 
 public:
+    enum DrawMode {
+        kLINE = 0x1,
+        kTEX = 0x2,
+    };
+
+public:
     Renderer();
 
     void SetFar(float vfar);
@@ -61,7 +67,7 @@ public:
 	void SetBufferSize(
 		std::uint32_t w, std::uint32_t h);
 
-    void SetEnabledLine(bool enabled);
+    void SetDrawMode(std::uint8_t mode);
 
 	void LookAt(
 		const Vec4 & eye,
@@ -98,7 +104,7 @@ private:
     Vec4 _cameraEye;
 
     float _far;
-    bool _enabledLine;
+    std::uint8_t _drawMode;
     std::uint32_t _lineRGB;
 	std::uint32_t _bufferW;
 	std::uint32_t _bufferH;

@@ -24,9 +24,9 @@ void Renderer::SetBufferSize(std::uint32_t w, std::uint32_t h)
     _zorderBuffer.reset(new std::uint32_t[w * h]);
 }
 
-void Renderer::SetEnabledLine(bool enabled)
-{ 
-    _enabledLine = enabled;
+void Renderer::SetDrawMode(std::uint8_t mode)
+{
+    _drawMode = mode;
 }
 
 void Renderer::LookAt(const Vec4 & eye, const Vec4 & up, const Vec4 & at)
@@ -169,11 +169,12 @@ void Renderer::Primitive(Vertex vert1, Vertex vert2, Vertex vert3)
     vert2.pt *= _screen;
     vert3.pt *= _screen;
 
-    //  光栅化
-    DrawTriangle(vert1, vert2, vert3);
-
-    //  线框绘制
-    if (_enabledLine)
+    if (_drawMode & DrawMode::kTEX)
+    {
+        DrawTriangle(vert1, vert2, vert3);
+    }
+    
+    if (_drawMode & DrawMode::kLINE)
     {
         DrawLine(vert1.pt.x, vert1.pt.y, vert2.pt.x, vert2.pt.y);
         DrawLine(vert2.pt.x, vert2.pt.y, vert3.pt.x, vert3.pt.y);
@@ -303,6 +304,7 @@ std::uint8_t Renderer::CheckCut(const Vec4 & vec)
 }
 
 Renderer::Renderer()
+    : _drawMode(DrawMode::kLINE)
 {
 }
 

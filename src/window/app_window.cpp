@@ -19,6 +19,9 @@ void AppWindow::OnMessage(UINT uint, WPARAM wparam, LPARAM lparam)
 			_cubePoint.y = 0;
 			_cubePoint.z = 1000;
 
+            _cubeRotateX = -40;
+            _cubeRotateY = -60;
+
             //  ÌùÍ¼
             _textures[0].InitFromFile("res/1.png");
             _textures[1].InitFromFile("res/2.png");
@@ -42,8 +45,8 @@ void AppWindow::OnMessage(UINT uint, WPARAM wparam, LPARAM lparam)
 	case WM_SIZE:
 		{
             _renderer.SetFar(2000);
-            _renderer.SetEnabledLine(true);
-            _renderer.SetLineRGB(RGB(0, 0, 0));
+            _renderer.SetLineRGB(RGB(255, 255, 255));
+            _renderer.SetDrawMode(Renderer::kLINE | Renderer::kTEX);
 			_renderer.SetBufferSize(GetWidth(), GetHeight());
 			_renderer.SetViewPort(0, 0, GetWidth(), GetHeight());
 			_renderer.LookAt({ 0, 0, 0 }, { 0, 1, 0 }, { 0, 0, 1 });
@@ -142,6 +145,6 @@ void AppWindow::OnRender()
 
     auto num = sizeof(vertexs) / sizeof(Vertex);
 	_renderer.Clear(0.0f, 0.0f, 0.0f);
-	_renderer.Primitive(num , vertexs, &_rgbShader);
+	_renderer.Primitive(num , vertexs, &_texShader);
 	FromRenderer(&_renderer);
 }
