@@ -20,8 +20,8 @@ void Renderer::SetBufferSize(std::uint32_t w, std::uint32_t h)
     _screen.m[1][1] = h * 0.5f;
     _screen.m[3][0] = w * 0.5f;
     _screen.m[3][1] = h * 0.5f;
-    _colorBuffer.reset(new std::uint32_t[w * h]);
-    _zorderBuffer.reset(new std::uint32_t[w * h]);
+    _fBuffer.reset(new std::uint32_t[w * h]);
+    _zBuffer.reset(new std::uint32_t[w * h]);
 }
 
 void Renderer::SetDrawMode(std::uint8_t mode)
@@ -67,13 +67,6 @@ void Renderer::SetViewPort(std::uint32_t x1, std::uint32_t y1, std::uint32_t x2,
 
 void Renderer::Primitive(size_t count, Vertex * vertexs, Shader * shader)
 {
-#ifdef RENDERER_DEBUG
-    _debug.vertexCount = count;
-    _debug.realVertexCount = 0;
-    _debug.triangleCount = count / 3;
-    _debug.realTriangleCount = 0;
-#endif
-
     //  初始化着色参数
     _shaderParam.ambientLight.x = 0.2f;
     _shaderParam.ambientLight.y = 0.2f;
@@ -96,15 +89,6 @@ void Renderer::Primitive(size_t count, Vertex * vertexs, Shader * shader)
 			        vertexs[i + 2]);
 	}
     _pRefShader = nullptr;
-#ifdef RENDERER_DEBUG
-    std::cout 
-        << SFormat("顶点总数: {0}, 渲染顶点数: {1}, 三角形数量: {2}, 渲染三角形数量: {3}", 
-                   _debug.vertexCount, 
-                   _debug.realVertexCount,
-                   _debug.triangleCount,
-                   _debug.realTriangleCount)
-        << std::endl;
-#endif
 }
 
 void Renderer::DrawLine(float x1, float y1, float x2, float y2)
@@ -117,7 +101,7 @@ void Renderer::DrawLine(float x1, float y1, float x2, float y2)
     for (auto i = 0; i != count; ++i)
     {
         auto idx = (size_t)(y1) * _bufferW + (size_t)(x1);
-        _colorBuffer[idx] = _lineRGB;
+        _fBuffer[idx] = _lineRGB;
         x1 += stepx; 
         y1 += stepy;
     }
@@ -251,10 +235,6 @@ void Renderer::DrawTriangle(const Vertex ** pVert)
         auto end = Vertex::LerpFromY(*pVert[0], *pVert[2], y);
         DrawScanLine(start, end);
     }
-#ifdef RENDERER_DEBUG
-    _debug.realTriangleCount += 1;
-    _debug.realVertexCount += 3;
-#endif
 }
 
 void Renderer::DrawScanLine(const Vertex & start, const Vertex & end)
@@ -280,14 +260,14 @@ void Renderer::DrawPoint(const Vertex & vert)
 {
     auto idx = (std::uint32_t)vert.pt.y * _bufferW + (std::uint32_t)vert.pt.x;
     assert(idx < _bufferW * _bufferH);
-    if (vert.pt.z < _zorderBuffer[idx])
+    if (vert.pt.z < _zBuffer[idx])
     {
         _shaderParam.u = vert.uv.u;
         _shaderParam.v = vert.uv.v;
         _shaderParam.point = vert.pt;
         _shaderParam.color = vert.color;
-        _colorBuffer[idx] = _pRefShader->FragmentFunc(_shaderParam);
-        _zorderBuffer[idx] = (std::uint32_t)vert.pt.z;
+        _fBuffer[idx] = _pRefShader->FragmentFunc(_shaderParam);
+        _zBuffer[idx] = (std::uint32_t)vert.pt.z;
     }
 }
 
@@ -323,12 +303,12 @@ void Renderer::SetFar(float vfar)
 void Renderer::Clear(float r, float g, float b)
 {
 	std::fill(
-		_colorBuffer.get(),
-		_colorBuffer.get() + _bufferW * _bufferH, 
+		_fBuffer.get(),
+		_fBuffer.get() + _bufferW * _bufferH, 
 		RGB(int(r * 255), int(g * 255), int(b * 255)));
 
     std::fill(
-        _zorderBuffer.get(),
-        _zorderBuffer.get() + _bufferW * _bufferH, UINT32_MAX);
+        _zBuffer.get(),
+        _zBuffer.get() + _bufferW * _bufferH, UINT32_MAX);
 }
 

@@ -1,6 +1,7 @@
 #pragma once
 
-#include "base.h"
+#include "math.h"
+#include <cstdint>
 
 class Color {
 public:
@@ -10,6 +11,12 @@ public:
     {
         r = _r; g = _g; 
         b = _b; a = _a;
+    }
+
+    Color(float _r, float _g, float _b)
+    {
+        r = _r; g = _g;
+        b = _b; a = 1.0f;
     }
 
     Color(const Color & v)
@@ -69,8 +76,16 @@ public:
                (Color::F2D(a));
     }
 
+    void Normal()
+    {
+        r = Math::Clamp(r, 1.0f, 0.0f);
+        g = Math::Clamp(g, 1.0f, 0.0f);
+        b = Math::Clamp(b, 1.0f, 0.0f);
+        a = Math::Clamp(a, 1.0f, 0.0f);
+    }
+
     inline static std::uint8_t F2D(float f)
     {
-        return f * 255.0f;
+        return static_cast<std::uint8_t>(f * 255.0f);
     }
 };

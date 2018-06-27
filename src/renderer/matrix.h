@@ -13,7 +13,7 @@ public:
 
 	void Zero()
 	{
-		std::memset(&m, 0, sizeof(float) * 16);
+		std::memset(&m, 0, sizeof(m));
 	}
 
 	Matrix4x4 operator *(const Matrix4x4 & v) const

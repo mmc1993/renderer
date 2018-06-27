@@ -31,26 +31,74 @@ struct Vertex {
 };
 
 class Renderer {
-#ifdef RENDERER_DEBUG
-public:
-    struct Debug {
-        std::uint32_t vertexCount;
-        std::uint32_t realVertexCount;
-        std::uint32_t triangleCount;
-        std::uint32_t realTriangleCount;
-        Debug()
-            : vertexCount(0)
-            , realVertexCount(0)
-            , triangleCount(0)
-            , realTriangleCount(0) 
-        { }
-    };
-#endif
-
 public:
     enum DrawMode {
         kLINE = 0x1,
         kTEX = 0x2,
+    };
+
+    struct Viewport {
+        std::uint32_t x;
+        std::uint32_t y;
+        std::uint32_t w;
+        std::uint32_t h;
+
+        Viewport(std::uint32_t _x = 0, std::uint32_t _y = 0, 
+                 std::uint32_t _w = 0, std::uint32_t _h = 0)
+        {
+            x = _x; y = _y;
+            w = _w; h = _h;
+        }
+    };
+
+    struct Size {
+        std::uint32_t w;
+        std::uint32_t h;
+
+        Size(std::uint32_t _w = 0, std::uint32_t _h = 0)
+        {
+            w = _w; h = _h;
+        }
+    };
+
+    struct Buffer {
+        std::unique_ptr<std::uint32_t[]> frame;
+        std::unique_ptr<std::uint32_t[]> zorder;
+
+        enum {
+            kFRAME = 0x1,
+            kZORDER = 0x2,
+        };
+
+        void Init(size_t count, std::uint8_t flag)
+        {
+            if (kFRAME & flag)
+            {
+                frame.reset(new std::uint32_t[count]);
+            }
+            if (kZORDER & flag)
+            {
+                zorder.reset(new std::uint32_t[count]);
+            }
+        }
+    };
+
+    struct Transform {
+        Matrix4x4 mvp;
+        Matrix4x4 view;
+        Matrix4x4 model;
+        Matrix4x4 project;
+        Matrix4x4 screen;
+    };
+
+    struct Camera {
+#ifdef far
+#undef far
+#endif
+        float far;
+        Vec4 look;
+        Vec4 eye;
+        Vec4 up;
     };
 
 public:
@@ -60,43 +108,44 @@ public:
 
 	void Clear(float r, float g, float b);
 
-	void SetViewPort(
-		std::uint32_t x1, std::uint32_t y1,
-		std::uint32_t x2, std::uint32_t y2);
-
-	void SetBufferSize(
-		std::uint32_t w, std::uint32_t h);
-
     void SetDrawMode(std::uint8_t mode);
-
-	void LookAt(
-		const Vec4 & eye,
-		const Vec4 & up,
-		const Vec4 & at);
-
-	void Primitive(size_t count, Vertex * vertexs, Shader * shader);
-
-    void DrawLine(float x1, float y1, float x2, float y2);
 
     void SetLineRGB(const std::uint32_t rgb);
 
+	void SetViewPort(std::uint32_t x1, std::uint32_t y1,
+		             std::uint32_t x2, std::uint32_t y2);
+
+	void SetBufferSize(std::uint32_t w, std::uint32_t h);
+
+	void LookAt(const Vec4 & eye, const Vec4 & up, const Vec4 & at);
+
+	void Primitive(size_t count, Vertex * vertexs, Shader * shader);
+
 	std::uint32_t GetBufferW() { return _bufferW; }
 	std::uint32_t GetBufferH() { return _bufferH; }
-	const std::unique_ptr<std::uint32_t[]> & GetBufferPtr() { return _colorBuffer; }
+	const std::unique_ptr<std::uint32_t[]> & GetFBufferPtr() { return _fBuffer; }
+    const std::unique_ptr<std::uint32_t[]> & GetZBufferPtr() { return _zBuffer; }
 
 private:
 	void Primitive(Vertex vert1, Vertex vert2, Vertex vert3);
 
-	//	²ð·ÖÈý½ÇÐÎ
     void DrawTriangle(const Vertex & vert1, const Vertex & vert2, const Vertex & vert3);
     void DrawTriangle(const Vertex ** pVert);
     void DrawScanLine(const Vertex & start, const Vertex & end);
+    void DrawLine(float x1, float y1, float x2, float y2);
     void DrawPoint(const Vertex & vert);
 
     //  CVV²Ã¼ô
     std::uint8_t CheckCut(const Vec4 & vec);
 
 private:
+    Transform _transform;
+    Viewport _viewport;
+    Camera _camera;
+    Buffer _buffer;
+    Size _bufferWH;
+
+
 	Matrix4x4 _mVP;
 	Matrix4x4 _view;
     Matrix4x4 _project;
@@ -112,15 +161,10 @@ private:
 	std::uint32_t _viewportY;
 	std::uint32_t _viewportW;
 	std::uint32_t _viewportH;
-	std::unique_ptr<std::uint32_t[]> _colorBuffer;
-    std::unique_ptr<std::uint32_t[]> _zorderBuffer;
+	std::unique_ptr<std::uint32_t[]> _fBuffer;
+    std::unique_ptr<std::uint32_t[]> _zBuffer;
 
     //  shader
     Shader::Param _shaderParam;
     Shader * _pRefShader;
-
-
-#ifdef RENDERER_DEBUG
-    Debug _debug;
-#endif
 };

@@ -32,8 +32,8 @@ private:
 
 	//	buffer
 	HDC _bufferDC;
-
-    void *_bufferBM;
+    void *_pBufferBM;
+    HBITMAP _bufferBM;
 
 private:
 	static LRESULT WINAPI OnWndProc(HWND hwnd, UINT uint, WPARAM wparam, LPARAM lparam);
