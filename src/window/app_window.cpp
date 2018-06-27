@@ -133,14 +133,20 @@ void AppWindow::OnRender()
 		_cubeRotateY -= 2.5f;
 	}
 
-	auto t = Matrix4x4::NewTranslate(_cubePoint.x, _cubePoint.y, _cubePoint.z);
-	auto rx = Matrix4x4::NewRotate(1, 0, 0, D2R(_cubeRotateX));
-	auto ry = Matrix4x4::NewRotate(0, 1, 0, D2R(_cubeRotateY));
-	auto m = t * rx * ry;
+    Matrix4x4 translate;
+    translate.Identity();
+    translate.Translate(_cubePoint.x, _cubePoint.y, _cubePoint.z);
+    Matrix4x4 rotateX;
+    rotateX.Identity();
+    rotateX.Rotate(1, 0, 0, D2R(_cubeRotateX));
+    Matrix4x4 rotateY;
+    rotateY.Identity();
+    rotateY.Rotate(0, 1, 0, D2R(_cubeRotateY));
+    auto transform = translate * rotateX * rotateY;
 
 	for (auto & vertex : vertexs)
 	{
-		vertex.pt = vertex.pt * m;
+		vertex.pt *= transform;
 	}
 
     auto num = sizeof(vertexs) / sizeof(Vertex);
