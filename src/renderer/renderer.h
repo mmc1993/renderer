@@ -3,6 +3,7 @@
 #include "../base.h"
 #include "matrix.h"
 #include "shader.h"
+#include "color.h"
 #include "vec4.h"
 #include "math.h"
 
@@ -34,7 +35,7 @@ class Renderer {
 public:
     enum DrawMode {
         kLINE = 0x1,
-        kTEX = 0x2,
+        kFILL = 0x2,
     };
 
     struct Viewport {
@@ -55,6 +56,11 @@ public:
         std::uint32_t w;
         std::uint32_t h;
 
+        std::uint32_t Product()
+        {
+            return w * h;
+        }
+
         Size(std::uint32_t _w = 0, std::uint32_t _h = 0)
         {
             w = _w; h = _h;
@@ -62,25 +68,28 @@ public:
     };
 
     struct Buffer {
+    public:
         std::unique_ptr<std::uint32_t[]> frame;
         std::unique_ptr<std::uint32_t[]> zorder;
 
-        enum {
-            kFRAME = 0x1,
-            kZORDER = 0x2,
-        };
-
-        void Init(size_t count, std::uint8_t flag)
+        void Init(size_t count)
         {
-            if (kFRAME & flag)
-            {
-                frame.reset(new std::uint32_t[count]);
-            }
-            if (kZORDER & flag)
-            {
-                zorder.reset(new std::uint32_t[count]);
-            }
+             frame.reset(new std::uint32_t[count]);
+             zorder.reset(new std::uint32_t[count]);
+            _count = count;
         }
+
+        size_t GetCount()
+        {
+            return _count;
+        }
+
+        size_t ToIndex(float x, float y, std::uint32_t pitch)
+        {
+            return static_cast<size_t>(y + 0.5f) * pitch + static_cast<size_t>(x + 0.5f);
+        }
+    private:
+        size_t _count;
     };
 
     struct Transform {
@@ -92,13 +101,10 @@ public:
     };
 
     struct Camera {
-#ifdef far
-#undef far
-#endif
-        float far;
-        Vec4 look;
+        float vfar;
         Vec4 eye;
         Vec4 up;
+        Vec4 at;
     };
 
 public:
@@ -119,25 +125,27 @@ public:
 
 	void LookAt(const Vec4 & eye, const Vec4 & up, const Vec4 & at);
 
-	void Primitive(size_t count, Vertex * vertexs, Shader * shader);
+    void Primitive(size_t count, Vertex * vertexs, Shader * shader);
 
-	std::uint32_t GetBufferW() { return _bufferW; }
-	std::uint32_t GetBufferH() { return _bufferH; }
-	const std::unique_ptr<std::uint32_t[]> & GetFBufferPtr() { return _fBuffer; }
-    const std::unique_ptr<std::uint32_t[]> & GetZBufferPtr() { return _zBuffer; }
+	std::uint32_t GetBufferW() { return _bufferWH.w; }
+	std::uint32_t GetBufferH() { return _bufferWH.h; }
+	const std::unique_ptr<std::uint32_t[]> & GetFBufferPtr() { return _buffer.frame; }
+    const std::unique_ptr<std::uint32_t[]> & GetZBufferPtr() { return _buffer.zorder; }
 
 private:
 	void Primitive(Vertex vert1, Vertex vert2, Vertex vert3);
-
     void DrawTriangle(const Vertex & vert1, const Vertex & vert2, const Vertex & vert3);
     void DrawTriangle(const Vertex ** pVert);
     void DrawScanLine(const Vertex & start, const Vertex & end);
     void DrawLine(float x1, float y1, float x2, float y2);
     void DrawPoint(const Vertex & vert);
 
-    //  CVV≤√ºÙ
-    std::uint8_t CheckCut(const Vec4 & vec);
-
+    //   ”Õº≤√ºÙ
+    std::uint8_t CheckViewCut(const Vec4 & vec);
+    //  ±≥√Ê≤√ºÙ
+    bool CheckBackCut(const Vec4 & pt1, 
+                      const Vec4 & pt2, 
+                      const Vec4 & pt3, Vec4 * outNormal);
 private:
     Transform _transform;
     Viewport _viewport;
@@ -145,24 +153,8 @@ private:
     Buffer _buffer;
     Size _bufferWH;
 
-
-	Matrix4x4 _mVP;
-	Matrix4x4 _view;
-    Matrix4x4 _project;
-    Matrix4x4 _screen;
-    Vec4 _cameraEye;
-
-    float _far;
     std::uint8_t _drawMode;
     std::uint32_t _lineRGB;
-	std::uint32_t _bufferW;
-	std::uint32_t _bufferH;
-	std::uint32_t _viewportX;
-	std::uint32_t _viewportY;
-	std::uint32_t _viewportW;
-	std::uint32_t _viewportH;
-	std::unique_ptr<std::uint32_t[]> _fBuffer;
-    std::unique_ptr<std::uint32_t[]> _zBuffer;
 
     //  shader
     Shader::Param _shaderParam;

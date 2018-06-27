@@ -70,18 +70,23 @@ public:
 
     std::uint32_t ToRGBA() const
     {
-        return (Color::F2D(r) << 24) |
-               (Color::F2D(g) << 16) |
-               (Color::F2D(b) << 8) |
-               (Color::F2D(a));
+        return Color::ToRGBA(r, g, b, a);
     }
 
     void Normal()
     {
+        a = Math::Clamp(a, 1.0f, 0.0f);
         r = Math::Clamp(r, 1.0f, 0.0f);
         g = Math::Clamp(g, 1.0f, 0.0f);
         b = Math::Clamp(b, 1.0f, 0.0f);
-        a = Math::Clamp(a, 1.0f, 0.0f);
+    }
+
+    inline static std::uint32_t ToRGBA(float r, float g, float b, float a)
+    {
+        return (Color::F2D(a) << 24) |
+               (Color::F2D(r) << 16) |
+               (Color::F2D(g) << 8) |
+               (Color::F2D(b) << 0);
     }
 
     inline static std::uint8_t F2D(float f)
