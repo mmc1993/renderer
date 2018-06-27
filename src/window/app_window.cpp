@@ -46,7 +46,7 @@ void AppWindow::OnMessage(UINT uint, WPARAM wparam, LPARAM lparam)
 		{
             _renderer.SetFar(2000);
             _renderer.SetLineRGB(RGB(255, 255, 255));
-            _renderer.SetDrawMode(Renderer::kLINE | Renderer::kTEX);
+            _renderer.SetDrawMode(Renderer::kLINE | Renderer::kFILL);
 			_renderer.SetBufferSize(GetWidth(), GetHeight());
 			_renderer.SetViewPort(0, 0, GetWidth(), GetHeight());
 			_renderer.LookAt({ 0, 0, 0 }, { 0, 1, 0 }, { 0, 0, 1 });
