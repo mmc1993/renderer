@@ -32,12 +32,6 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="src\math\vec4.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="src\math\matrix.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
     <ClInclude Include="src\window\window.h">
       <Filter>头文件</Filter>
     </ClInclude>
@@ -48,9 +42,6 @@
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="src\third\sformat.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="src\math\number.h">
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="src\third\stb_image.h">
@@ -69,6 +60,21 @@
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="src\renderer\texture.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="src\renderer\base.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="src\renderer\color.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="src\renderer\vec4.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="src\renderer\matrix.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="src\renderer\math.h">
       <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>

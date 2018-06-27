@@ -127,9 +127,11 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\base.h" />
-    <ClInclude Include="src\math\matrix.h" />
-    <ClInclude Include="src\math\number.h" />
-    <ClInclude Include="src\math\vec4.h" />
+    <ClInclude Include="src\renderer\matrix.h" />
+    <ClInclude Include="src\renderer\math.h" />
+    <ClInclude Include="src\renderer\vec4.h" />
+    <ClInclude Include="src\renderer\base.h" />
+    <ClInclude Include="src\renderer\color.h" />
     <ClInclude Include="src\renderer\renderer.h" />
     <ClInclude Include="src\renderer\rgb_shader.h" />
     <ClInclude Include="src\renderer\shader.h" />
