@@ -137,6 +137,7 @@
     <ClInclude Include="src\renderer\shader.h" />
     <ClInclude Include="src\renderer\texture.h" />
     <ClInclude Include="src\renderer\tex_shader.h" />
+    <ClInclude Include="src\renderer\vertex.h" />
     <ClInclude Include="src\third\sformat.h" />
     <ClInclude Include="src\third\stb_image.h" />
     <ClInclude Include="src\window\app_window.h" />

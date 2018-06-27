@@ -77,5 +77,8 @@
     <ClInclude Include="src\renderer\math.h">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="src\renderer\vertex.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>
