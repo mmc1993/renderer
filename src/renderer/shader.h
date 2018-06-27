@@ -1,9 +1,9 @@
 #pragma once
 
 #include "../base.h"
-#include "../math/vec4.h"
-#include "../math/matrix.h"
-#include "../math/number.h"
+#include "matrix.h"
+#include "vec4.h"
+#include "math.h"
 
 class Shader {
 public:

@@ -1,8 +1,8 @@
 #pragma once
 
 #include "../base.h"
-#include "../math/vec4.h"
-#include "../math/number.h"
+#include "math.h"
+#include "vec4.h"
 
 class Texture {
 public:
@@ -17,7 +17,7 @@ public:
         auto i = ConverToIndex(u, v);
         return { static_cast<float>(_data[i    ]) / 255.0f, 
                  static_cast<float>(_data[i + 1]) / 255.0f,
-                 static_cast<float>(_data[i + 2]) / 255.0f };
+                 static_cast<float>(_data[i + 2]) / 255.0f, 255 };
     }
 
     bool InitFromFile(const std::string & fname);
@@ -25,8 +25,8 @@ public:
 private:
     size_t ConverToIndex(float u, float v)
     {
-        u = Number::Clamp(u, 1.0f, 0.0f);
-        v = Number::Clamp(v, 1.0f, 0.0f);
+        u = Math::Clamp(u, 1.0f, 0.0f);
+        v = Math::Clamp(v, 1.0f, 0.0f);
         auto x = static_cast<std::uint32_t>(u * (_w - 1));
         auto y = static_cast<std::uint32_t>(v * (_h - 1));
         return static_cast<size_t>(y * _w * _channel + x * _channel);

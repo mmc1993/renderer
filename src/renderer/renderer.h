@@ -1,10 +1,10 @@
 #pragma once
 
 #include "../base.h"
-#include "../math/vec4.h"
-#include "../math/matrix.h"
-#include "../math/number.h"
+#include "matrix.h"
 #include "shader.h"
+#include "vec4.h"
+#include "math.h"
 
 class Window;
 
@@ -17,10 +17,10 @@ struct Vertex {
     static Vertex Lerp(const Vertex & v1, const Vertex & v2, float t)
     {
         Vertex vert;
-        vert.pt = Number::Lerp(v1.pt, v2.pt, t);
-        vert.uv.u = Number::Lerp(v1.uv.u, v2.uv.u, t);
-        vert.uv.v = Number::Lerp(v1.uv.v, v2.uv.v, t);
-        vert.color = Number::Lerp(v1.color, v2.color, t);
+        vert.pt = Math::Lerp(v1.pt, v2.pt, t);
+        vert.uv.u = Math::Lerp(v1.uv.u, v2.uv.u, t);
+        vert.uv.v = Math::Lerp(v1.uv.v, v2.uv.v, t);
+        vert.color = Math::Lerp(v1.color, v2.color, t);
         return vert;
     }
 
