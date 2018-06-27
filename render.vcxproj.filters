@@ -80,5 +80,14 @@
     <ClInclude Include="src\renderer\vertex.h">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="src\renderer\material.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="src\renderer\sprite.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="src\renderer\mesh.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

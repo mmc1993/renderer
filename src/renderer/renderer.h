@@ -3,33 +3,10 @@
 #include "../base.h"
 #include "matrix.h"
 #include "shader.h"
+#include "vertex.h"
 #include "color.h"
 #include "vec4.h"
 #include "math.h"
-
-class Window;
-
-struct Vertex {
-	Vec4 pt;
-	Vec4 color;
-	Vec4 normal;
-    struct { float u; float v; } uv;
-
-    static Vertex Lerp(const Vertex & v1, const Vertex & v2, float t)
-    {
-        Vertex vert;
-        vert.pt = Math::Lerp(v1.pt, v2.pt, t);
-        vert.uv.u = Math::Lerp(v1.uv.u, v2.uv.u, t);
-        vert.uv.v = Math::Lerp(v1.uv.v, v2.uv.v, t);
-        vert.color = Math::Lerp(v1.color, v2.color, t);
-        return vert;
-    }
-
-    static Vertex LerpFromY(const Vertex & v1, const Vertex & v2, float y)
-    {
-        return Vertex::Lerp(v1, v2, std::abs(1.0f / (v2.pt.y - v1.pt.y) * y));
-    }
-};
 
 class Renderer {
 public:
@@ -74,8 +51,8 @@ public:
 
         void Init(size_t count)
         {
-             frame.reset(new std::uint32_t[count]);
-             zorder.reset(new std::uint32_t[count]);
+            frame.reset(new std::uint32_t[count]);
+            zorder.reset(new std::uint32_t[count]);
             _count = count;
         }
 
@@ -86,7 +63,7 @@ public:
 
         size_t ToIndex(float x, float y, std::uint32_t pitch)
         {
-            return static_cast<size_t>(y + 0.5f) * pitch + static_cast<size_t>(x + 0.5f);
+            return static_cast<size_t>(y) * pitch + static_cast<size_t>(x);
         }
     private:
         size_t _count;
@@ -134,18 +111,26 @@ public:
 
 private:
 	void Primitive(Vertex vert1, Vertex vert2, Vertex vert3);
-    void DrawTriangle(const Vertex & vert1, const Vertex & vert2, const Vertex & vert3);
-    void DrawTriangle(const Vertex ** pVert);
+
+    void DrawTriangle(const Vertex & vert1, 
+                      const Vertex & vert2, 
+                      const Vertex & vert3);
+
+    void DrawTriangleBottom(const Vertex ** pVert);
+
+    void DrawTriangleTop(const Vertex ** pVert);
+
     void DrawScanLine(const Vertex & start, const Vertex & end);
+
     void DrawLine(float x1, float y1, float x2, float y2);
+
     void DrawPoint(const Vertex & vert);
 
-    //   ”Õº≤√ºÙ
-    std::uint8_t CheckViewCut(const Vec4 & vec);
-    //  ±≥√Ê≤√ºÙ
-    bool CheckBackCut(const Vec4 & pt1, 
-                      const Vec4 & pt2, 
+    bool CheckBackCut(const Vec4 & pt1, const Vec4 & pt2, 
                       const Vec4 & pt3, Vec4 * outNormal);
+
+    std::uint8_t CheckViewCut(const Vec4 & vec);
+
 private:
     Transform _transform;
     Viewport _viewport;

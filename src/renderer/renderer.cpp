@@ -1,16 +1,5 @@
 #include "renderer.h"
 
-#include "../window/window.h"
-
-class Vec4;
-namespace std {
-    template <>
-    inline std::string to_string(const Vec4 & v4)
-    {
-        return SFormat("vec4: {0}\n x: {1}\n y: {2}\n z: {3}\n w: {4}", (size_t)&v4, v4.x, v4.y, v4.z, v4.w);
-    }
-}
-
 Renderer::Renderer(): _drawMode(DrawMode::kLINE)
 { }
 
@@ -164,89 +153,106 @@ void Renderer::Primitive(Vertex vert1, Vertex vert2, Vertex vert3)
 
 void Renderer::DrawTriangle(const Vertex & vert1, const Vertex & vert2, const Vertex & vert3)
 {
-    //  y ÅÅÁÐË³Ðò: 0 > 1 > 2
-    const Vertex * pVertex[3] = { nullptr };
+    const Vertex * pVert[3] = { nullptr, nullptr, nullptr };
     if (vert1.pt.y == vert2.pt.y)
     {
-        pVertex[0] = &vert3;
-        pVertex[1] = &vert1;
-        pVertex[2] = &vert2;
+        pVert[0] = &vert3;
+        pVert[1] = &vert1;
+        pVert[2] = &vert2;
     }
     else if (vert1.pt.y == vert3.pt.y)
     {
-        pVertex[0] = &vert2;
-        pVertex[1] = &vert1;
-        pVertex[2] = &vert3;
+        pVert[0] = &vert2;
+        pVert[1] = &vert1;
+        pVert[2] = &vert3;
     }
     else if (vert2.pt.y == vert3.pt.y)
     {
-        pVertex[0] = &vert1;
-        pVertex[1] = &vert2;
-        pVertex[2] = &vert3;
+        pVert[0] = &vert1;
+        pVert[1] = &vert2;
+        pVert[2] = &vert3;
     }
     else
     {
-        Vertex vertexs[3];
+        Vertex verts[3];
         if (vert1.pt.y > vert2.pt.y && vert1.pt.y > vert3.pt.y)
         {
-            vertexs[0] = vert1;
-            vertexs[1] = vert2.pt.y > vert3.pt.y ? vert2 : vert3;
-            vertexs[2] = vert2.pt.y > vert3.pt.y ? vert3 : vert2;
+            verts[0] = vert1;
+            verts[1] = vert2.pt.y > vert3.pt.y ? vert2 : vert3;
+            verts[2] = vert2.pt.y > vert3.pt.y ? vert3 : vert2;
         }
         else if (vert2.pt.y > vert1.pt.y && vert2.pt.y > vert3.pt.y)
         {
-            vertexs[0] = vert2;
-            vertexs[1] = vert1.pt.y > vert3.pt.y ? vert1 : vert3;
-            vertexs[2] = vert1.pt.y > vert3.pt.y ? vert3 : vert1;
+            verts[0] = vert2;
+            verts[1] = vert1.pt.y > vert3.pt.y ? vert1 : vert3;
+            verts[2] = vert1.pt.y > vert3.pt.y ? vert3 : vert1;
         }
         else if (vert3.pt.y > vert1.pt.y && vert3.pt.y > vert2.pt.y)
         {
-            vertexs[0] = vert3;
-            vertexs[1] = vert1.pt.y > vert2.pt.y ? vert1 : vert2;
-            vertexs[2] = vert1.pt.y > vert2.pt.y ? vert2 : vert1;
+            verts[0] = vert3;
+            verts[1] = vert1.pt.y > vert2.pt.y ? vert1 : vert2;
+            verts[2] = vert1.pt.y > vert2.pt.y ? vert2 : vert1;
         }
-        auto vert4 = Vertex::LerpFromY(vertexs[0],
-            vertexs[2],
-            vertexs[1].pt.y - vertexs[0].pt.y);
-        vert4.pt.y = vertexs[1].pt.y;
-        DrawTriangle(vertexs[0], vert4, vertexs[1]);
-        DrawTriangle(vertexs[1], vert4, vertexs[2]);
+        auto vert4 = verts[0].LerpFromY(verts[2], 
+                                        verts[1].pt.y - verts[0].pt.y);
+        vert4.pt.y = verts[1].pt.y;
+        DrawTriangle(verts[0], vert4, verts[1]);
+        DrawTriangle(verts[1], vert4, verts[2]);
     }
 
-    if (pVertex[0] != nullptr && pVertex[1] != nullptr && pVertex[2] != nullptr)
+    if (pVert[0] != nullptr || pVert[1] != nullptr || pVert[2] != nullptr)
     {
-        DrawTriangle(pVertex);
+        if (pVert[1]->pt.x > pVert[2]->pt.x)
+        {
+            std::swap(pVert[1], pVert[2]);
+        }
+
+        if (pVert[0]->pt.y < pVert[1]->pt.y)
+        {
+            DrawTriangleTop(pVert);
+        }
+        else
+        {
+            DrawTriangleBottom(pVert);
+        }
     }
 }
 
-void Renderer::DrawTriangle(const Vertex ** pVert)
+void Renderer::DrawTriangleBottom(const Vertex ** pVert)
 {
-    auto y = pVert[0]->pt.y - pVert[1]->pt.y;
-    auto l = std::abs(y);
-    auto s = y / l;
-    for (auto i = 0; i <= l; ++i, y -= s)
+    auto dy = pVert[1]->pt.y - pVert[0]->pt.y;
+    for (auto y = 0; y >= dy; --y)
     {
-        auto start = Vertex::LerpFromY(*pVert[0], *pVert[1], y);
-        auto end = Vertex::LerpFromY(*pVert[0], *pVert[2], y);
+        auto start = pVert[0]->LerpFromY(*pVert[1], (float)y);
+        auto end = pVert[0]->LerpFromY(*pVert[2], (float)y);
+        DrawScanLine(start, end);
+    }
+}
+
+void Renderer::DrawTriangleTop(const Vertex ** pVert)
+{
+    auto dy = pVert[1]->pt.y - pVert[0]->pt.y;
+    for (auto y = dy; y >=0; --y)
+    {
+        auto start = pVert[0]->LerpFromY(*pVert[1], (float)y);
+        auto end = pVert[0]->LerpFromY(*pVert[2], (float)y);
         DrawScanLine(start, end);
     }
 }
 
 void Renderer::DrawScanLine(const Vertex & start, const Vertex & end)
 {
-    auto w = std::floor(end.pt.x - start.pt.x + 0.5f);
-    auto l = std::abs(w);
-    auto cs = (end.color - start.color) / l;
-    auto us = (end.uv.u - start.uv.u) / l;
-    auto vs = (end.uv.v - start.uv.v) / l;
-    auto xs = w / l;
-    Vertex vert = start;
-    for (auto i = 0; i <= l; ++i)
+    auto w = std::ceil(end.pt.x - start.pt.x)/* + 0.5f*/;
+    auto cs = (end.color - start.color) / w;
+    auto us = (end.u - start.u) / w;
+    auto vs = (end.v - start.v) / w;
+    auto vert = start;
+    for (auto x = 0; x <= w; ++x)
     {
         DrawPoint(vert);
-        vert.pt.x = vert.pt.x + xs;
-        vert.uv.u = vert.uv.u + us;
-        vert.uv.v = vert.uv.v + vs;
+        vert.u = vert.u + us;
+        vert.v = vert.v + vs;
+        vert.pt.x = vert.pt.x + 1.0f;
         vert.color = vert.color + cs;
     }
 }
@@ -256,7 +262,7 @@ void Renderer::DrawLine(float x1, float y1, float x2, float y2)
     auto diffx = x2 - x1;
     auto diffy = y2 - y1;
     auto count = size_t(std::max(std::abs(diffx),
-        std::abs(diffy)));
+                                 std::abs(diffy)));
     auto stepx = diffx / count;
     auto stepy = diffy / count;
     for (auto i = 0; i != count; ++i)
@@ -267,14 +273,14 @@ void Renderer::DrawLine(float x1, float y1, float x2, float y2)
     }
 }
 
-void Renderer::DrawPoint(const Vertex & vert)
+inline void Renderer::DrawPoint(const Vertex & vert)
 {
     auto index = _buffer.ToIndex(vert.pt.x, vert.pt.y, _bufferWH.w);
     assert(index < _bufferWH.Product());
     if (vert.pt.z < _buffer.zorder[index])
     {
-        _shaderParam.u = vert.uv.u;
-        _shaderParam.v = vert.uv.v;
+        _shaderParam.u = vert.u;
+        _shaderParam.v = vert.v;
         _shaderParam.point = vert.pt;
         _shaderParam.color = vert.color;
         _buffer.frame[index] = _pRefShader->FragmentFunc(_shaderParam);
@@ -282,7 +288,7 @@ void Renderer::DrawPoint(const Vertex & vert)
     }
 }
 
-std::uint8_t Renderer::CheckViewCut(const Vec4 & vec)
+inline std::uint8_t Renderer::CheckViewCut(const Vec4 & vec)
 {
     auto ret = (std::uint8_t)0;
     if (vec.x < -vec.w) ret |= 1;
@@ -294,7 +300,7 @@ std::uint8_t Renderer::CheckViewCut(const Vec4 & vec)
     return ret;
 }
 
-bool Renderer::CheckBackCut(const Vec4 & pt1, const Vec4 & pt2, const Vec4 & pt3, Vec4 * outNormal)
+inline bool Renderer::CheckBackCut(const Vec4 & pt1, const Vec4 & pt2, const Vec4 & pt3, Vec4 * outNormal)
 {
     auto normal = (pt2 - pt1).Cross(pt3 - pt2);
     auto direct = (pt1 - _camera.eye);

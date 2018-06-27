@@ -1,4 +1,5 @@
 #include "app_window.h"
+#include "../renderer/color.h"
 
 AppWindow::AppWindow()
 {
@@ -19,8 +20,8 @@ void AppWindow::OnMessage(UINT uint, WPARAM wparam, LPARAM lparam)
 			_cubePoint.y = 0;
 			_cubePoint.z = 1000;
 
-            _cubeRotateX = -40;
-            _cubeRotateY = -60;
+            _cubeRotateX = -0;
+            _cubeRotateY = -0;
 
             //  贴图
             _textures[0].InitFromFile("res/1.png");
@@ -46,7 +47,7 @@ void AppWindow::OnMessage(UINT uint, WPARAM wparam, LPARAM lparam)
 		{
             _renderer.SetFar(2000);
             _renderer.SetLineRGB(RGB(255, 255, 255));
-            _renderer.SetDrawMode(Renderer::kLINE | Renderer::kFILL);
+            _renderer.SetDrawMode(/*Renderer::kLINE | */Renderer::kFILL);
 			_renderer.SetBufferSize(GetWidth(), GetHeight());
 			_renderer.SetViewPort(0, 0, GetWidth(), GetHeight());
 			_renderer.LookAt({ 0, 0, 0 }, { 0, 1, 0 }, { 0, 0, 1 });
@@ -59,40 +60,40 @@ void AppWindow::OnRender()
 {
     static const Vertex s_vertexs[] = {
         //  前   0
-        { Vec4(-200, -200, -200), Vec4(1, 0, 0), Vec4(), {0, 1} },
-        { Vec4(-200, 200, -200), Vec4(0, 1, 0), Vec4(), {0, 0} },
-        { Vec4(200, 200, -200), Vec4(1, 0, 0), Vec4(), {1, 0} },
-        { Vec4(200, -200, -200), Vec4(0, 0, 1), Vec4(), {1, 1} },
+        { Vec4(-200, -200, -200), Color(1, 0, 0), Vec4(), 0, 1 },
+        { Vec4(-200, 200, -200), Color(0, 1, 0), Vec4(), 0, 0 },
+        { Vec4(200, 200, -200), Color(1, 0, 0), Vec4(), 1, 0 },
+        { Vec4(200, -200, -200), Color(0, 0, 1), Vec4(), 1, 1 },
 
         //  后   4
-        { Vec4(-200, -200, 200), Vec4(0, 0, 1), Vec4(), {0, 1} },
-        { Vec4(-200, 200, 200), Vec4(1, 0, 0), Vec4(), {0, 0} },
-        { Vec4(200, 200, 200), Vec4(0, 1, 0), Vec4(), {1, 0} },
-        { Vec4(200, -200, 200), Vec4(1, 0, 0), Vec4(), {1, 1} },
+        { Vec4(-200, -200, 200), Color(0, 0, 1), Vec4(), 0, 1 },
+        { Vec4(-200, 200, 200), Color(1, 0, 0), Vec4(), 0, 0 },
+        { Vec4(200, 200, 200), Color(0, 1, 0), Vec4(), 1, 0},
+        { Vec4(200, -200, 200), Color(1, 0, 0), Vec4(), 1, 1 },
 
         //  上   8
-        { Vec4(-200, 200, -200), Vec4(0, 0, 1), Vec4(), {0, 1} },
-        { Vec4(-200, 200, 200), Vec4(1, 0, 0), Vec4(), {0, 0} },
-        { Vec4(200, 200, 200), Vec4(0, 1, 0), Vec4(), {1, 0} },
-        { Vec4(200, 200, -200), Vec4(1, 0, 0), Vec4(), {1, 1} },
+        { Vec4(-200, 200, -200), Color(0, 0, 1), Vec4(), 0, 1 },
+        { Vec4(-200, 200, 200), Color(1, 0, 0), Vec4(), 0, 0 },
+        { Vec4(200, 200, 200), Color(0, 1, 0), Vec4(), 1, 0 },
+        { Vec4(200, 200, -200), Color(1, 0, 0), Vec4(), 1, 1 },
 
         //  下   12
-        { Vec4(-200, -200, 200), Vec4(0, 0, 1), Vec4(), {0, 1} },
-        { Vec4(-200, -200, -200), Vec4(1, 0, 0), Vec4(), {0, 0} },
-        { Vec4(200, -200, -200), Vec4(0, 1, 0), Vec4(), {1, 0} },
-        { Vec4(200, -200, 200), Vec4(1, 0, 0), Vec4(), {1, 1} },
+        { Vec4(-200, -200, 200), Color(0, 0, 1), Vec4(), 0, 1 },
+        { Vec4(-200, -200, -200), Color(1, 0, 0), Vec4(), 0, 0 },
+        { Vec4(200, -200, -200), Color(0, 1, 0), Vec4(), 1, 0 },
+        { Vec4(200, -200, 200), Color(1, 0, 0), Vec4(), 1, 1 },
 
         //  左   16
-        { Vec4(-200, -200, 200), Vec4(0, 0, 1), Vec4(), {0, 1} },
-        { Vec4(-200, 200, 200), Vec4(1, 0, 0), Vec4(), {0, 0} },
-        { Vec4(-200, 200, -200), Vec4(0, 1, 0), Vec4(), {1, 0} },
-        { Vec4(-200, -200, -200), Vec4(1, 0, 0), Vec4(), {1, 1} },
+        { Vec4(-200, -200, 200), Color(0, 0, 1), Vec4(), 0, 1 },
+        { Vec4(-200, 200, 200), Color(1, 0, 0), Vec4(), 0, 0 },
+        { Vec4(-200, 200, -200), Color(0, 1, 0), Vec4(), 1, 0 },
+        { Vec4(-200, -200, -200), Color(1, 0, 0), Vec4(), 1, 1 },
 
         //  右   20
-        { Vec4(200, -200, -200), Vec4(0, 0, 1), Vec4(), {0, 1} },
-        { Vec4(200, 200, -200), Vec4(1, 0, 0), Vec4(), {0, 0} },
-        { Vec4(200, 200, 200), Vec4(0, 1, 0), Vec4(), {1, 0} },
-        { Vec4(200, -200, 200), Vec4(1, 0, 0), Vec4(), {1, 1} },
+        { Vec4(200, -200, -200), Color(0, 0, 1), Vec4(), 0, 1 },
+        { Vec4(200, 200, -200), Color(1, 0, 0), Vec4(), 0, 0 },
+        { Vec4(200, 200, 200), Color(0, 1, 0), Vec4(), 1, 0 },
+        { Vec4(200, -200, 200), Color(1, 0, 0), Vec4(), 1, 1 },
     };
 
     Vertex vertexs[] = {
