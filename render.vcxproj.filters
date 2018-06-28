@@ -30,6 +30,12 @@
     <ClCompile Include="src\renderer\texture.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
+    <ClCompile Include="src\renderer\sprite.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="src\third\json\cJSON.c">
+      <Filter>源文件</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\math\vec4.h">
@@ -69,6 +75,51 @@
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="src\renderer\texture.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="src\io\assets_io.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="src\renderer\shader\shader.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="src\renderer\shader\tex_shader.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="src\renderer\base.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="src\renderer\color.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="src\renderer\material.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="src\renderer\math.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="src\renderer\matrix.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="src\renderer\mesh.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="src\renderer\pipeline.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="src\renderer\sprite.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="src\renderer\vec4.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="src\renderer\vertex.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="src\third\json\cJSON.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="src\third\json\json.h">
       <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>
