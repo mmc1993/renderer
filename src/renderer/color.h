@@ -31,10 +31,8 @@ public:
 
     Color & operator =(const Color & v)
     {
-        r = v.r; 
-        g = v.g; 
-        b = v.b; 
-        a = v.a;
+        r = v.r; g = v.g; 
+        b = v.b; a = v.a;
         return *this;
     }
 

@@ -47,34 +47,37 @@ public:
 	{
 		auto cos0 = std::cos(radian);
 		auto sin0 = std::sin(radian);
-		m[0][0] = x * x * (1 - cos0) + cos0;
-		m[0][1] = x * y * (1 - cos0) + z * sin0;
-		m[0][2] = x * y * (1 - cos0) - y * sin0;
+        Matrix4x4 mat;mat.Identity();
+        mat.m[0][0] = x * x * (1 - cos0) + cos0;
+        mat.m[0][1] = x * y * (1 - cos0) + z * sin0;
+        mat.m[0][2] = x * y * (1 - cos0) - y * sin0;
 
-		m[1][0] = x * y * (1 - cos0) - z * sin0;
-		m[1][1] = y * y * (1 - cos0) + cos0;
-		m[1][2] = y * z * (1 - cos0) + x * sin0;
+        mat.m[1][0] = x * y * (1 - cos0) - z * sin0;
+        mat.m[1][1] = y * y * (1 - cos0) + cos0;
+        mat.m[1][2] = y * z * (1 - cos0) + x * sin0;
 
-		m[2][0] = x * z * (1 - cos0) + y * sin0;
-		m[2][1] = y * z * (1 - cos0) - x * sin0;
-		m[2][2] = z * z * (1 - cos0) + cos0;
-		return *this;
+        mat.m[2][0] = x * z * (1 - cos0) + y * sin0;
+        mat.m[2][1] = y * z * (1 - cos0) - x * sin0;
+        mat.m[2][2] = z * z * (1 - cos0) + cos0;
+		return (*this = this->operator*(mat));
 	}
 
     Matrix4x4 & Translate(float x, float y, float z)
     {
-        m[3][0] = x;
-        m[3][1] = y;
-        m[3][2] = z;
-        return *this;
+        Matrix4x4 mat; mat.Identity();
+        mat.m[3][0] = x;
+        mat.m[3][1] = y;
+        mat.m[3][2] = z;
+        return (*this = this->operator*(mat));
     }
 
 	Matrix4x4 & Scale(float x, float y, float z)
 	{
+        Matrix4x4 mat; mat.Identity();
 		m[0][0] = x;
 		m[1][1] = x;
 		m[2][2] = x;
-		return *this;
+		return (*this = this->operator*(mat));
 	}
 };
 
