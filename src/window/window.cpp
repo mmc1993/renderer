@@ -4,12 +4,22 @@
 
 Window::Window()
 	: _bufferDC(nullptr)
-    , _bufferBM(nullptr)
+    , _pBufferBM(nullptr)
 	, _hwnd(nullptr)
 { }
 
 Window::~Window()
-{ }
+{
+    if (_bufferDC != nullptr)
+    {
+        DeleteDC(_bufferDC);
+    }
+
+    if (_bufferBM != nullptr)
+    {
+        DeleteObject(_bufferBM);
+    }
+}
 
 void Window::Create(const std::string & title)
 {
@@ -29,7 +39,7 @@ void Window::Create(const std::string & title)
 				nullptr, nullptr, nullptr, this);
 }
 
-void Window::Move(u_int x, u_int y)
+void Window::Move(std::uint16_t x, std::uint16_t y)
 {
 	auto w = GetWidth();
 	auto h = GetHeight();
@@ -42,7 +52,7 @@ void Window::Move(u_int x, u_int y)
 	MoveWindow(_hwnd, x, y, w + addW, h + addH, TRUE);
 }
 
-void Window::Size(u_int w, u_int h)
+void Window::Size(std::uint16_t w, std::uint16_t h)
 {
 	auto window = RECT{ 0 };
 	auto client = RECT{ 0 };
@@ -63,18 +73,18 @@ void Window::Loop()
 	}
 }
 
-u_int Window::GetWidth()
+std::uint16_t Window::GetWidth()
 {
 	auto client = RECT{ 0 };
 	GetClientRect(_hwnd, &client);
-	return client.right - client.left;
+	return (std::uint16_t)(client.right - client.left);
 }
 
-u_int Window::GetHeight()
+std::uint16_t Window::GetHeight()
 {
 	auto client = RECT{ 0 };
 	GetClientRect(_hwnd, &client);
-	return client.bottom - client.top;
+	return (std::uint16_t)(client.bottom - client.top);
 }
 
 void Window::InitBuffer()
@@ -84,27 +94,31 @@ void Window::InitBuffer()
 		DeleteDC(_bufferDC);
 	}
 
-	auto hdc = GetDC(_hwnd);
-	_bufferDC = CreateCompatibleDC(hdc);
-	ReleaseDC(_hwnd, hdc);
-
+    if (_bufferBM != nullptr)
+    {
+        DeleteObject(_bufferBM);
+    }
+    
     auto bmi = BITMAPINFO{ 0 };
-    auto & bmh = static_cast<BITMAPINFOHEADER &>(bmi.bmiHeader);
-    bmh.biSize = sizeof(BITMAPINFOHEADER);
-    bmh.biPlanes = 1;
-    bmh.biBitCount = 32;
-    //bmh.biXPelsPerMeter = 96;
-    //bmh.biYPelsPerMeter = 96;
-    bmh.biWidth = GetWidth();
-    bmh.biHeight = GetHeight();
-    bmh.biCompression = BI_RGB;
-    bmh.biSizeImage = bmh.biWidth * bmh.biHeight  * 4;
-    SelectObject(_bufferDC, CreateDIBSection(_bufferDC, &bmi, DIB_RGB_COLORS, &_bufferBM, 0, 0));
+    bmi.bmiHeader.biBitCount = 32;
+    bmi.bmiHeader.biPlanes = 1;
+    bmi.bmiHeader.biWidth = GetWidth();
+    bmi.bmiHeader.biHeight = GetHeight();
+    bmi.bmiHeader.biCompression = BI_RGB;
+    bmi.bmiHeader.biSize = sizeof(BITMAPINFOHEADER);
+    bmi.bmiHeader.biSizeImage = bmi.bmiHeader.biWidth * bmi.bmiHeader.biHeight  * 4;
+    _bufferBM = CreateDIBSection(_bufferDC, &bmi, DIB_RGB_COLORS, &_pBufferBM, 0, 0);
+
+    auto hdc = GetDC(_hwnd);
+    _bufferDC = CreateCompatibleDC(hdc);
+    ReleaseDC(_hwnd, hdc);
+
+    SelectObject(_bufferDC, _bufferBM);
 }
 
 void Window::FromRenderer(Renderer * prd)
 {
-    memcpy(_bufferBM, prd->GetBufferPtr().get(), GetWidth() * GetHeight() * 4);
+    memcpy(_pBufferBM, prd->GetFBufferPtr().get(), GetWidth() * GetHeight() * 4);
 
 	auto hdc = GetDC(_hwnd);
 	BitBlt(hdc, 0, 0, GetWidth(), GetHeight(), _bufferDC, 0, 0, SRCCOPY);

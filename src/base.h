@@ -25,4 +25,6 @@
 
 #define RGBA(r, g, b, a) ((a) << 24 | (r) << 16 | (g) << 8 | (b) << 0)
 
+#define F2B(v)	((v) * 255)
+
 #define RENDERER_DEBUG

@@ -1,8 +1,6 @@
 #pragma once
 
-#include <type_traits>
-
-class Number {
+class Math {
 public:
     template <class T>
     static T Lerp(const T & v1, const T & v2, float t)
@@ -13,7 +11,6 @@ public:
     template <class T>
     static T Clamp(const T & v, const T & max, const T & min)
     {
-        static_assert(std::is_arithmetic<T>::value);
         return v > max ? max : v < min ? min : v;
     }
 };

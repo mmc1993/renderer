@@ -1,56 +1,102 @@
 #pragma once
 
 #include "../base.h"
-#include "../math/vec4.h"
-#include "../math/matrix.h"
-#include "../math/number.h"
-#include "shader.h"
 
-class Window;
-
-struct Vertex {
-	Vec4 pt;
-	Vec4 color;
-	Vec4 normal;
-    struct { float u; float v; } uv;
-
-    static Vertex Lerp(const Vertex & v1, const Vertex & v2, float t)
-    {
-        Vertex vert;
-        vert.pt = Number::Lerp(v1.pt, v2.pt, t);
-        vert.uv.u = Number::Lerp(v1.uv.u, v2.uv.u, t);
-        vert.uv.v = Number::Lerp(v1.uv.v, v2.uv.v, t);
-        vert.color = Number::Lerp(v1.color, v2.color, t);
-        return vert;
-    }
-
-    static Vertex LerpFromY(const Vertex & v1, const Vertex & v2, float y)
-    {
-        return Vertex::Lerp(v1, v2, std::abs(1.0f / (v2.pt.y - v1.pt.y) * y));
-    }
-};
+#include "pipeline.h"
+#include "material.h"
+#include "matrix.h"
+#include "vertex.h"
+#include "color.h"
+#include "vec4.h"
+#include "math.h"
+#include "mesh.h"
 
 class Renderer {
-#ifdef RENDERER_DEBUG
-public:
-    struct Debug {
-        std::uint32_t vertexCount;
-        std::uint32_t realVertexCount;
-        std::uint32_t triangleCount;
-        std::uint32_t realTriangleCount;
-        Debug()
-            : vertexCount(0)
-            , realVertexCount(0)
-            , triangleCount(0)
-            , realTriangleCount(0) 
-        { }
-    };
-#endif
-
 public:
     enum DrawMode {
         kLINE = 0x1,
-        kTEX = 0x2,
+        kFILL = 0x2,
+        kCOLOR = 0x4,
+    };
+
+    struct Viewport {
+        std::uint32_t x;
+        std::uint32_t y;
+        std::uint32_t w;
+        std::uint32_t h;
+
+        Viewport(std::uint32_t _x = 0, std::uint32_t _y = 0, 
+                 std::uint32_t _w = 0, std::uint32_t _h = 0)
+        {
+            x = _x; y = _y;
+            w = _w; h = _h;
+        }
+    };
+
+    struct Size {
+        std::uint32_t w;
+        std::uint32_t h;
+
+        std::uint32_t Product()
+        {
+            return w * h;
+        }
+
+        Size(std::uint32_t _w = 0, std::uint32_t _h = 0)
+        {
+            w = _w; h = _h;
+        }
+    };
+
+    struct Buffer {
+    public:
+        std::unique_ptr<std::uint32_t[]> frame;
+        std::unique_ptr<std::uint32_t[]> zorder;
+
+        void Init(size_t count)
+        {
+            frame.reset(new std::uint32_t[count]);
+            zorder.reset(new std::uint32_t[count]);
+            _count = count;
+        }
+
+        size_t GetCount()
+        {
+            return _count;
+        }
+
+        size_t ToIndex(float x, float y, std::uint32_t pitch)
+        {
+            return static_cast<size_t>(y) * pitch + static_cast<size_t>(x);
+        }
+    private:
+        size_t _count;
+    };
+
+    struct Transform {
+        Matrix4x4 mvp;
+        Matrix4x4 view;
+        Matrix4x4 model;
+        Matrix4x4 project;
+        Matrix4x4 screen;
+    };
+
+    struct Camera {
+        float vfar;
+        Vec4 eye;
+        Vec4 up;
+        Vec4 at;
+    };
+
+    struct Render {
+        Mesh * mesh;
+        Material * material;
+        PipelineParam param;
+        Render()
+        {
+            mesh = nullptr;
+            material = nullptr;
+        }
     };
 
 public:
@@ -60,67 +106,63 @@ public:
 
 	void Clear(float r, float g, float b);
 
-	void SetViewPort(
-		std::uint32_t x1, std::uint32_t y1,
-		std::uint32_t x2, std::uint32_t y2);
-
-	void SetBufferSize(
-		std::uint32_t w, std::uint32_t h);
-
     void SetDrawMode(std::uint8_t mode);
-
-	void LookAt(
-		const Vec4 & eye,
-		const Vec4 & up,
-		const Vec4 & at);
-
-	void Primitive(size_t count, Vertex * vertexs, Shader * shader);
-
-    void DrawLine(float x1, float y1, float x2, float y2);
 
     void SetLineRGB(const std::uint32_t rgb);
 
-	std::uint32_t GetBufferW() { return _bufferW; }
-	std::uint32_t GetBufferH() { return _bufferH; }
-	const std::unique_ptr<std::uint32_t[]> & GetBufferPtr() { return _colorBuffer; }
+    void SetModelMatrix(const Matrix4x4 & mat);
+
+	void SetViewPort(std::uint32_t x1, std::uint32_t y1,
+		             std::uint32_t x2, std::uint32_t y2);
+
+	void SetBufferSize(std::uint32_t w, std::uint32_t h);
+
+	void LookAt(const Vec4 & eye, const Vec4 & up, const Vec4 & at);
+
+    void Primitive(size_t count, Vertex * vertexs, Shader * shader);
+
+    void Primitive(Mesh * mesh, Material * material);
+
+	std::uint32_t GetBufferW() { return _bufferWH.w; }
+	std::uint32_t GetBufferH() { return _bufferWH.h; }
+	const std::unique_ptr<std::uint32_t[]> & GetFBufferPtr() { return _buffer.frame; }
+    const std::unique_ptr<std::uint32_t[]> & GetZBufferPtr() { return _buffer.zorder; }
 
 private:
-	void Primitive(Vertex vert1, Vertex vert2, Vertex vert3);
+	void Primitive(Vertex v1, Vertex v2, Vertex v3);
 
-	//	²ð·ÖÈý½ÇÐÎ
-    void DrawTriangle(const Vertex & vert1, const Vertex & vert2, const Vertex & vert3);
-    void DrawTriangle(const Vertex ** pVert);
+    void DrawTriangle(const Vertex & v1, 
+                      const Vertex & v2, 
+                      const Vertex & v3);
+
+    void DrawTriangleBottom(const Vertex ** pVert);
+
+    void DrawTriangleTop(const Vertex ** pVert);
+
     void DrawScanLine(const Vertex & start, const Vertex & end);
+
+    void DrawLine(float x1, float y1, float x2, float y2);
+
     void DrawPoint(const Vertex & vert);
 
-    //  CVV²Ã¼ô
-    std::uint8_t CheckCut(const Vec4 & vec);
+    void VertexShader(const Vertex & v, Vec4 * outv);
+
+    void FragmentShader(const Vertex & v, Color * outc);
+
+    bool CheckBackCut(const Vec4 & pt1, const Vec4 & pt2, 
+                      const Vec4 & pt3, Vec4 * outNormal);
+
+    std::uint8_t CheckViewCut(const Vec4 & vec);
 
 private:
-	Matrix4x4 _mVP;
-	Matrix4x4 _view;
-    Matrix4x4 _project;
-    Matrix4x4 _screen;
-    Vec4 _cameraEye;
+    Transform _transform;
+    Viewport _viewport;
+    Camera _camera;
+    Buffer _buffer;
+    Size _bufferWH;
 
-    float _far;
     std::uint8_t _drawMode;
     std::uint32_t _lineRGB;
-	std::uint32_t _bufferW;
-	std::uint32_t _bufferH;
-	std::uint32_t _viewportX;
-	std::uint32_t _viewportY;
-	std::uint32_t _viewportW;
-	std::uint32_t _viewportH;
-	std::unique_ptr<std::uint32_t[]> _colorBuffer;
-    std::unique_ptr<std::uint32_t[]> _zorderBuffer;
 
-    //  shader
-    Shader::Param _shaderParam;
-    Shader * _pRefShader;
-
-
-#ifdef RENDERER_DEBUG
-    Debug _debug;
-#endif
+    Render _render;
 };
