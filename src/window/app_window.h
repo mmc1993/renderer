@@ -4,8 +4,7 @@
 
 #include "../renderer/texture.h"
 #include "../renderer/renderer.h"
-#include "../renderer/tex_shader.h"
-#include "../renderer/rgb_shader.h"
+#include "../renderer/shader/tex_shader.h"
 
 class AppWindow: public Window {
 public:
@@ -25,8 +24,6 @@ private:
     
     Texture _textures[4];
     TexShader _texShader;
-    RGBShader _rgbShader;
-
 
 	Renderer _renderer;
 };

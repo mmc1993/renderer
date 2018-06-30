@@ -1,18 +1,22 @@
 #pragma once
 
 #include "../base.h"
+
+#include "pipeline.h"
+#include "material.h"
 #include "matrix.h"
-#include "shader.h"
 #include "vertex.h"
 #include "color.h"
 #include "vec4.h"
 #include "math.h"
+#include "mesh.h"
 
 class Renderer {
 public:
     enum DrawMode {
         kLINE = 0x1,
         kFILL = 0x2,
+        kCOLOR = 0x4,
     };
 
     struct Viewport {
@@ -84,6 +88,17 @@ public:
         Vec4 at;
     };
 
+    struct Render {
+        Mesh * mesh;
+        Material * material;
+        PipelineParam param;
+        Render()
+        {
+            mesh = nullptr;
+            material = nullptr;
+        }
+    };
+
 public:
     Renderer();
 
@@ -95,6 +110,8 @@ public:
 
     void SetLineRGB(const std::uint32_t rgb);
 
+    void SetModelMatrix(const Matrix4x4 & mat);
+
 	void SetViewPort(std::uint32_t x1, std::uint32_t y1,
 		             std::uint32_t x2, std::uint32_t y2);
 
@@ -104,17 +121,19 @@ public:
 
     void Primitive(size_t count, Vertex * vertexs, Shader * shader);
 
+    void Primitive(Mesh * mesh, Material * material);
+
 	std::uint32_t GetBufferW() { return _bufferWH.w; }
 	std::uint32_t GetBufferH() { return _bufferWH.h; }
 	const std::unique_ptr<std::uint32_t[]> & GetFBufferPtr() { return _buffer.frame; }
     const std::unique_ptr<std::uint32_t[]> & GetZBufferPtr() { return _buffer.zorder; }
 
 private:
-	void Primitive(Vertex vert1, Vertex vert2, Vertex vert3);
+	void Primitive(Vertex v1, Vertex v2, Vertex v3);
 
-    void DrawTriangle(const Vertex & vert1, 
-                      const Vertex & vert2, 
-                      const Vertex & vert3);
+    void DrawTriangle(const Vertex & v1, 
+                      const Vertex & v2, 
+                      const Vertex & v3);
 
     void DrawTriangleBottom(const Vertex ** pVert);
 
@@ -125,6 +144,10 @@ private:
     void DrawLine(float x1, float y1, float x2, float y2);
 
     void DrawPoint(const Vertex & vert);
+
+    void VertexShader(const Vertex & v, Vec4 * outv);
+
+    void FragmentShader(const Vertex & v, Color * outc);
 
     bool CheckBackCut(const Vec4 & pt1, const Vec4 & pt2, 
                       const Vec4 & pt3, Vec4 * outNormal);
@@ -141,7 +164,5 @@ private:
     std::uint8_t _drawMode;
     std::uint32_t _lineRGB;
 
-    //  shader
-    Shader::Param _shaderParam;
-    Shader * _pRefShader;
+    Render _render;
 };

@@ -1,10 +1,9 @@
 #pragma once
 
 #include "../base.h"
-#include "matrix.h"
-#include "color.h"
-#include "vec4.h"
-#include "math.h"
+#include "../math/vec4.h"
+#include "../math/matrix.h"
+#include "../math/number.h"
 
 class Shader {
 public:
@@ -14,7 +13,7 @@ public:
         Vec4 cameraPoint;           //  相机坐标
         Vec4 ambientLight;          //  环境光
         Vec4 directLight;           //  方向光
-        Color color;                //  颜色
+        Vec4 color;                 //  颜色
         Vec4 point;                 //  坐标
         Vec4 normal;                //  法线
         float u, v;                 //  uv
@@ -35,7 +34,9 @@ public:
 
     virtual std::uint32_t FragmentFunc(Param & param)
     {
-        return param.color.ToRGBA();
+        return RGB( (int)(param.color.x * 255.0f), 
+                    (int)(param.color.y * 255.0f), 
+                    (int)(param.color.z * 255.0f) );
     }
 };
 

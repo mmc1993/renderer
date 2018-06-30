@@ -31,6 +31,14 @@ void Renderer::SetLineRGB(const std::uint32_t rgb)
     _lineRGB = rgb;
 }
 
+void Renderer::SetModelMatrix(const Matrix4x4 & mat)
+{
+    _transform.model = mat;
+    _transform.mvp = _transform.model
+                   * _transform.view 
+                   * _transform.project;
+}
+
 void Renderer::SetViewPort(std::uint32_t x1, std::uint32_t y1, std::uint32_t x2, std::uint32_t y2)
 {
     _viewport.x = x1;
@@ -85,113 +93,107 @@ void Renderer::LookAt(const Vec4 & eye, const Vec4 & up, const Vec4 & at)
 void Renderer::Primitive(size_t count, Vertex * vertexs, Shader * shader)
 {
     //  初始化着色参数
-    _pRefShader = shader;
     for (auto i = 0; i != count; i += 3)
     {
         Primitive(vertexs[i    ],
                   vertexs[i + 1],
                   vertexs[i + 2]);
     }
-    _pRefShader = nullptr;
 }
 
-void Renderer::Primitive(Vertex vert1, Vertex vert2, Vertex vert3)
+void Renderer::Primitive(Mesh * mesh, Material * material)
 {
-    if (!CheckBackCut(vert1.pt, vert2.pt, vert3.pt, &vert1.normal))
+    _render.mesh = mesh;
+    _render.material = material;
+    _render.param.material = material;
+    _render.param.mvp = _transform.mvp;
+    const auto & vertexs = mesh->GetMesh();
+    for (auto i = 0; i != vertexs.size(); ++i)
     {
-        return;
+        Primitive(vertexs.at(i    ),
+                  vertexs.at(i + 1),
+                  vertexs.at(i + 2));
     }
-    vert2.normal = vert1.normal;
-    vert3.normal = vert1.normal;
+}
 
-    _shaderParam.vpMat = _transform.mvp;
+void Renderer::Primitive(Vertex v1, Vertex v2, Vertex v3)
+{
+    //  裁剪
+    VertexShader(v1, &v1.pt);
+    if (CheckViewCut(v1.pt) != 0) { return; }
+    VertexShader(v2, &v2.pt);
+    if (CheckViewCut(v2.pt) != 0) { return; }
+    VertexShader(v3, &v3.pt);
+    if (CheckViewCut(v3.pt) != 0) { return; }
 
-    _shaderParam.point = vert1.pt;
-    _shaderParam.normal = vert1.normal;
-    vert1.pt = _pRefShader->VertexFunc(_shaderParam);
-    if (CheckViewCut(vert1.pt) != 0) { return; }
+    //  背面剔除
+    if (!CheckBackCut(v1.pt, v2.pt, v3.pt, &v1.normal)) { return; }
+    v2.normal = v1.normal; 
+    v3.normal = v1.normal;
 
-    _shaderParam.point = vert2.pt;
-    _shaderParam.normal = vert2.normal;
-    vert2.pt = _pRefShader->VertexFunc(_shaderParam);
-    if (CheckViewCut(vert2.pt) != 0) { return; }
-
-    _shaderParam.point = vert3.pt;
-    _shaderParam.normal = vert3.normal;
-    vert3.pt = _pRefShader->VertexFunc(_shaderParam);
-    if (CheckViewCut(vert3.pt) != 0) { return; }
-
-    vert1.pt.x /= vert1.pt.w;
-    vert1.pt.y /= vert1.pt.w;
-    vert1.pt.w /= vert1.pt.w;
-
-    vert2.pt.x /= vert2.pt.w;
-    vert2.pt.y /= vert2.pt.w;
-    vert2.pt.w /= vert2.pt.w;
-
-    vert3.pt.x /= vert3.pt.w;
-    vert3.pt.y /= vert3.pt.w;
-    vert3.pt.w /= vert3.pt.w;
+    v1.pt.x /= v1.pt.w; v1.pt.y /= v1.pt.w; v1.pt.w /= v1.pt.w;
+    v2.pt.x /= v2.pt.w; v2.pt.y /= v2.pt.w; v2.pt.w /= v2.pt.w;
+    v3.pt.x /= v3.pt.w; v3.pt.y /= v3.pt.w; v3.pt.w /= v3.pt.w;
 
     //  变换到平面坐标
-    vert1.pt *= _transform.screen;
-    vert2.pt *= _transform.screen;
-    vert3.pt *= _transform.screen;
+    v1.pt *= _transform.screen;
+    v2.pt *= _transform.screen;
+    v3.pt *= _transform.screen;
 
     if (_drawMode & DrawMode::kFILL)
     {
-        DrawTriangle(vert1, vert2, vert3);
+        DrawTriangle(v1, v2, v3);
     }
 
     if (_drawMode & DrawMode::kLINE)
     {
-        DrawLine(vert1.pt.x, vert1.pt.y, vert2.pt.x, vert2.pt.y);
-        DrawLine(vert2.pt.x, vert2.pt.y, vert3.pt.x, vert3.pt.y);
-        DrawLine(vert3.pt.x, vert3.pt.y, vert1.pt.x, vert1.pt.y);
+        DrawLine(v1.pt.x, v1.pt.y, v2.pt.x, v2.pt.y);
+        DrawLine(v2.pt.x, v2.pt.y, v3.pt.x, v3.pt.y);
+        DrawLine(v3.pt.x, v3.pt.y, v1.pt.x, v1.pt.y);
     }
 }
 
-void Renderer::DrawTriangle(const Vertex & vert1, const Vertex & vert2, const Vertex & vert3)
+void Renderer::DrawTriangle(const Vertex & v1, const Vertex & v2, const Vertex & v3)
 {
     const Vertex * pVert[3] = { nullptr, nullptr, nullptr };
-    if (vert1.pt.y == vert2.pt.y)
+    if (v1.pt.y == v2.pt.y)
     {
-        pVert[0] = &vert3;
-        pVert[1] = &vert1;
-        pVert[2] = &vert2;
+        pVert[0] = &v3;
+        pVert[1] = &v1;
+        pVert[2] = &v2;
     }
-    else if (vert1.pt.y == vert3.pt.y)
+    else if (v1.pt.y == v3.pt.y)
     {
-        pVert[0] = &vert2;
-        pVert[1] = &vert1;
-        pVert[2] = &vert3;
+        pVert[0] = &v2;
+        pVert[1] = &v1;
+        pVert[2] = &v3;
     }
-    else if (vert2.pt.y == vert3.pt.y)
+    else if (v2.pt.y == v3.pt.y)
     {
-        pVert[0] = &vert1;
-        pVert[1] = &vert2;
-        pVert[2] = &vert3;
+        pVert[0] = &v1;
+        pVert[1] = &v2;
+        pVert[2] = &v3;
     }
     else
     {
         Vertex verts[3];
-        if (vert1.pt.y > vert2.pt.y && vert1.pt.y > vert3.pt.y)
+        if (v1.pt.y > v2.pt.y && v1.pt.y > v3.pt.y)
         {
-            verts[0] = vert1;
-            verts[1] = vert2.pt.y > vert3.pt.y ? vert2 : vert3;
-            verts[2] = vert2.pt.y > vert3.pt.y ? vert3 : vert2;
+            verts[0] = v1;
+            verts[1] = v2.pt.y > v3.pt.y ? v2 : v3;
+            verts[2] = v2.pt.y > v3.pt.y ? v3 : v2;
         }
-        else if (vert2.pt.y > vert1.pt.y && vert2.pt.y > vert3.pt.y)
+        else if (v2.pt.y > v1.pt.y && v2.pt.y > v3.pt.y)
         {
-            verts[0] = vert2;
-            verts[1] = vert1.pt.y > vert3.pt.y ? vert1 : vert3;
-            verts[2] = vert1.pt.y > vert3.pt.y ? vert3 : vert1;
+            verts[0] = v2;
+            verts[1] = v1.pt.y > v3.pt.y ? v1 : v3;
+            verts[2] = v1.pt.y > v3.pt.y ? v3 : v1;
         }
-        else if (vert3.pt.y > vert1.pt.y && vert3.pt.y > vert2.pt.y)
+        else if (v3.pt.y > v1.pt.y && v3.pt.y > v2.pt.y)
         {
-            verts[0] = vert3;
-            verts[1] = vert1.pt.y > vert2.pt.y ? vert1 : vert2;
-            verts[2] = vert1.pt.y > vert2.pt.y ? vert2 : vert1;
+            verts[0] = v3;
+            verts[1] = v1.pt.y > v2.pt.y ? v1 : v2;
+            verts[2] = v1.pt.y > v2.pt.y ? v2 : v1;
         }
         auto vert4 = verts[0].LerpFromY(verts[2], 
                                         verts[1].pt.y - verts[0].pt.y);
@@ -242,7 +244,7 @@ void Renderer::DrawTriangleTop(const Vertex ** pVert)
 
 void Renderer::DrawScanLine(const Vertex & start, const Vertex & end)
 {
-    auto w = std::ceil(end.pt.x - start.pt.x)/* + 0.5f*/;
+    auto w = std::ceil(end.pt.x - start.pt.x);
     auto cs = (end.color - start.color) / w;
     auto us = (end.u - start.u) / w;
     auto vs = (end.v - start.v) / w;
@@ -279,13 +281,40 @@ inline void Renderer::DrawPoint(const Vertex & vert)
     assert(index < _bufferWH.Product());
     if (vert.pt.z < _buffer.zorder[index])
     {
-        _shaderParam.u = vert.u;
-        _shaderParam.v = vert.v;
-        _shaderParam.point = vert.pt;
-        _shaderParam.color = vert.color;
-        _buffer.frame[index] = _pRefShader->FragmentFunc(_shaderParam);
+        Color color;
+        if (kCOLOR & _drawMode)
+        {
+            color = vert.color;
+        }
+        else
+        {
+            FragmentShader(vert, &color);
+        }
+        _buffer.frame[index] = color.ToRGBA();
         _buffer.zorder[index] = static_cast<std::uint32_t>(vert.pt.z);
     }
+}
+
+void Renderer::VertexShader(const Vertex & v, Vec4 * outv)
+{
+    _render.param.v = v.pt;
+    _render.param.c = v.color;
+    _render.param.n = v.normal;
+    _render.param.uv.u = v.u;
+    _render.param.uv.v = v.v;
+    _render.material->GetShader()->VertexFunc(_render.param);
+    *outv = _render.param.v;
+}
+
+void Renderer::FragmentShader(const Vertex & v, Color * outc)
+{
+    _render.param.v = v.pt;
+    _render.param.c = v.color;
+    _render.param.n = v.normal;
+    _render.param.uv.u = v.u;
+    _render.param.uv.v = v.v;
+    _render.material->GetShader()->FragmentFunc(_render.param);
+    *outc = _render.param.c;
 }
 
 inline std::uint8_t Renderer::CheckViewCut(const Vec4 & vec)
