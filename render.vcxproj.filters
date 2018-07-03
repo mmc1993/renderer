@@ -33,7 +33,10 @@
     <ClCompile Include="src\renderer\sprite.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="src\third\json\cJSON.c">
+    <ClCompile Include="src\renderer\io\file\file.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="src\renderer\io\file\file_vrml.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>
@@ -65,15 +68,6 @@
     <ClInclude Include="src\renderer\renderer.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="src\renderer\rgb_shader.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="src\renderer\shader.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="src\renderer\tex_shader.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
     <ClInclude Include="src\renderer\texture.h">
       <Filter>头文件</Filter>
     </ClInclude>
@@ -84,9 +78,6 @@
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="src\renderer\shader\tex_shader.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="src\renderer\base.h">
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="src\renderer\color.h">
@@ -116,10 +107,16 @@
     <ClInclude Include="src\renderer\vertex.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="src\third\json\cJSON.h">
+    <ClInclude Include="src\third\json.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="src\third\json\json.h">
+    <ClInclude Include="src\renderer\shader\rgb_shader.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="src\renderer\io\file\file.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="src\renderer\io\file\file_vrml.h">
       <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>

@@ -120,10 +120,11 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="src\main.cpp" />
+    <ClCompile Include="src\renderer\io\file\file.cpp" />
+    <ClCompile Include="src\renderer\io\file\file_vrml.cpp" />
     <ClCompile Include="src\renderer\renderer.cpp" />
     <ClCompile Include="src\renderer\sprite.cpp" />
     <ClCompile Include="src\renderer\texture.cpp" />
-    <ClCompile Include="src\third\json\cJSON.c" />
     <ClCompile Include="src\window\app_window.cpp" />
     <ClCompile Include="src\window\window.cpp" />
   </ItemGroup>
@@ -133,25 +134,23 @@
     <ClInclude Include="src\math\matrix.h" />
     <ClInclude Include="src\math\number.h" />
     <ClInclude Include="src\math\vec4.h" />
-    <ClInclude Include="src\renderer\base.h" />
     <ClInclude Include="src\renderer\color.h" />
+    <ClInclude Include="src\renderer\io\file\file.h" />
+    <ClInclude Include="src\renderer\io\file\file_vrml.h" />
     <ClInclude Include="src\renderer\material.h" />
     <ClInclude Include="src\renderer\math.h" />
     <ClInclude Include="src\renderer\matrix.h" />
     <ClInclude Include="src\renderer\mesh.h" />
     <ClInclude Include="src\renderer\pipeline.h" />
     <ClInclude Include="src\renderer\renderer.h" />
-    <ClInclude Include="src\renderer\rgb_shader.h" />
-    <ClInclude Include="src\renderer\shader.h" />
+    <ClInclude Include="src\renderer\shader\rgb_shader.h" />
     <ClInclude Include="src\renderer\shader\shader.h" />
     <ClInclude Include="src\renderer\shader\tex_shader.h" />
     <ClInclude Include="src\renderer\sprite.h" />
     <ClInclude Include="src\renderer\texture.h" />
-    <ClInclude Include="src\renderer\tex_shader.h" />
     <ClInclude Include="src\renderer\vec4.h" />
     <ClInclude Include="src\renderer\vertex.h" />
-    <ClInclude Include="src\third\json\cJSON.h" />
-    <ClInclude Include="src\third\json\json.h" />
+    <ClInclude Include="src\third\json.h" />
     <ClInclude Include="src\third\sformat.h" />
     <ClInclude Include="src\third\stb_image.h" />
     <ClInclude Include="src\window\app_window.h" />
