@@ -119,8 +119,6 @@ public:
 
 	void LookAt(const Vec4 & eye, const Vec4 & up, const Vec4 & at);
 
-    void Primitive(size_t count, Vertex * vertexs, Shader * shader);
-
     void Primitive(Mesh * mesh, Material * material);
 
 	std::uint32_t GetBufferW() { return _bufferWH.w; }
@@ -149,8 +147,8 @@ private:
 
     void FragmentShader(const Vertex & v, Color * outc);
 
-    bool CheckBackCut(const Vec4 & pt1, const Vec4 & pt2, 
-                      const Vec4 & pt3, Vec4 * outNormal);
+    bool CheckBackCut(const Vec4 & p1, const Vec4 & p2, 
+                      const Vec4 & p3, Vec4 * outNormal);
 
     std::uint8_t CheckViewCut(const Vec4 & vec);
 

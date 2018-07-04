@@ -90,17 +90,6 @@ void Renderer::LookAt(const Vec4 & eye, const Vec4 & up, const Vec4 & at)
     _camera.eye = eye;
 }
 
-void Renderer::Primitive(size_t count, Vertex * vertexs, Shader * shader)
-{
-    //  初始化着色参数
-    for (auto i = 0; i != count; i += 3)
-    {
-        Primitive(vertexs[i    ],
-                  vertexs[i + 1],
-                  vertexs[i + 2]);
-    }
-}
-
 void Renderer::Primitive(Mesh * mesh, Material * material)
 {
     _render.mesh = mesh;
@@ -108,7 +97,7 @@ void Renderer::Primitive(Mesh * mesh, Material * material)
     _render.param.material = material;
     _render.param.mvp = _transform.mvp;
     const auto & vertexs = mesh->GetMesh();
-    for (auto i = 0; i != vertexs.size(); ++i)
+    for (auto i = 0; i != vertexs.size(); i += 3)
     {
         Primitive(vertexs.at(i    ),
                   vertexs.at(i + 1),
@@ -128,7 +117,7 @@ void Renderer::Primitive(Vertex v1, Vertex v2, Vertex v3)
 
     //  背面剔除
     if (!CheckBackCut(v1.pt, v2.pt, v3.pt, &v1.normal)) { return; }
-    v2.normal = v1.normal; 
+    v2.normal = v1.normal;
     v3.normal = v1.normal;
 
     v1.pt.x /= v1.pt.w; v1.pt.y /= v1.pt.w; v1.pt.w /= v1.pt.w;
@@ -303,7 +292,7 @@ void Renderer::VertexShader(const Vertex & v, Vec4 * outv)
     _render.param.uv.u = v.u;
     _render.param.uv.v = v.v;
     _render.material->GetShader()->VertexFunc(_render.param);
-    *outv = _render.param.v;
+    *outv = _render.param.outv;
 }
 
 void Renderer::FragmentShader(const Vertex & v, Color * outc)
@@ -314,7 +303,7 @@ void Renderer::FragmentShader(const Vertex & v, Color * outc)
     _render.param.uv.u = v.u;
     _render.param.uv.v = v.v;
     _render.material->GetShader()->FragmentFunc(_render.param);
-    *outc = _render.param.c;
+    *outc = _render.param.outc;
 }
 
 inline std::uint8_t Renderer::CheckViewCut(const Vec4 & vec)
@@ -329,11 +318,14 @@ inline std::uint8_t Renderer::CheckViewCut(const Vec4 & vec)
     return ret;
 }
 
-inline bool Renderer::CheckBackCut(const Vec4 & pt1, const Vec4 & pt2, const Vec4 & pt3, Vec4 * outNormal)
+inline bool Renderer::CheckBackCut(const Vec4 & p1, const Vec4 & p2, const Vec4 & p3, Vec4 * outNormal)
 {
-    auto normal = (pt2 - pt1).Cross(pt3 - pt2);
-    auto direct = (pt1 - _camera.eye);
-    if (normal.Dot(direct) > 0) { return false; }
+    auto normal = (p2 - p1).Cross(p3 - p2);
+    auto direct = (p1 - _camera.eye);
+    if (normal.Dot(direct) < 0)
+    {
+        return false;
+    }
     *outNormal = normal;
     outNormal->Normal();
     return true;
