@@ -39,6 +39,9 @@
     <ClCompile Include="src\renderer\io\file\file_vrml.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
+    <ClCompile Include="src\cache\mesh_cache.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\math\vec4.h">
@@ -117,6 +120,15 @@
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="src\renderer\io\file\file_vrml.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="src\cache\mesh_cache.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="src\cache\material_cache.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="src\cache\base_cache.h">
       <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>

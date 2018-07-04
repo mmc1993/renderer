@@ -120,6 +120,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="src\main.cpp" />
+    <ClCompile Include="src\cache\mesh_cache.cpp" />
     <ClCompile Include="src\renderer\io\file\file.cpp" />
     <ClCompile Include="src\renderer\io\file\file_vrml.cpp" />
     <ClCompile Include="src\renderer\renderer.cpp" />
@@ -130,7 +131,10 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\base.h" />
+    <ClInclude Include="src\cache\base_cache.h" />
+    <ClInclude Include="src\cache\material_cache.h" />
     <ClInclude Include="src\io\assets_io.h" />
+    <ClInclude Include="src\cache\mesh_cache.h" />
     <ClInclude Include="src\math\matrix.h" />
     <ClInclude Include="src\math\number.h" />
     <ClInclude Include="src\math\vec4.h" />
