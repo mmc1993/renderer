@@ -2,39 +2,58 @@
 #include "../../mesh.h"
 #include "../../vertex.h"
 
-#define CHECK_RET(ret)  { if (!ret) return false; }
+#define CHECK_RET(ret)  { if (!(ret)) return false; }
 
 bool FileVRML::LoadMesh(const std::string & fname, Mesh * mesh)
 {
     VRML vrml;
-    auto string = LoadFile(fname);
+    auto string = GetFileString(fname);
     if (Parse(string.c_str(), &vrml))
     {
-        //  TODO ¼ÌÐøÐ´
-        //vrml.
+        for (auto i = 0; i != vrml.coordIdxs.size() / 3; ++i)
+        {
+            Vertex v0, v1, v2;
+            v0.pt = vrml.coords.at(vrml.coordIdxs.at(i * 3));
+            v1.pt = vrml.coords.at(vrml.coordIdxs.at(i * 3 + 1));
+            v2.pt = vrml.coords.at(vrml.coordIdxs.at(i * 3 + 2));
+
+            v0.color = vrml.colors.at(vrml.colorIdxs.at(i));
+            v1.color = vrml.colors.at(vrml.colorIdxs.at(i));
+            v2.color = vrml.colors.at(vrml.colorIdxs.at(i));
+
+            v0.normal = vrml.normals.at(vrml.normalIdxs.at(i));
+            v1.normal = vrml.normals.at(vrml.normalIdxs.at(i));
+            v2.normal = vrml.normals.at(vrml.normalIdxs.at(i));
+            mesh->AddVertexs(v0, v1, v2);
+        }
+        return true;
     }
     return false;
 }
 
-bool FileVRML::Parse(const char * string, VRML * output)
+bool FileVRML::Parse(const std::string & string, VRML * output)
 {
+    size_t pos = 0;
     std::vector<float> numbers;
-    string = SkipField(string, "point [");
-    string = ParseList(string, &numbers);
-    CHECK_RET(*string != '\0');
-    //  x z y => x y z
-    for (auto i = 0; i != numbers.size() / 3; i += 3)
+
+    pos = string.find("point [", pos);
+    CHECK_RET(pos != std::string::npos);
+    pos = ParseList(string, pos + 7, &numbers);
+    CHECK_RET(pos != string.size());
+    for (auto i = 0; i != numbers.size(); i += 3)
     {
+        //  x z y => x y z
         output->coords.emplace_back(numbers.at(i    ), 
-                                    numbers.at(i + 2), 
-                                    numbers.at(i + 1));
+                                    numbers.at(i + 1), 
+                                    -numbers.at(i + 2));
     }
 
     numbers.clear();
-    string = SkipField(string, "color [");
-    string = ParseList(string, &numbers);
-    CHECK_RET(*string != '\0');
-    for (auto i = 0; i != numbers.size() / 3; i += 3)
+    pos = string.find("color [", pos);
+    CHECK_RET(pos != std::string::npos);
+    pos = ParseList(string, pos + 7, &numbers);
+    CHECK_RET(pos != string.size());
+    for (auto i = 0; i != numbers.size(); i += 3)
     {
         output->colors.emplace_back(numbers.at(i    ),
                                     numbers.at(i + 1),
@@ -42,38 +61,44 @@ bool FileVRML::Parse(const char * string, VRML * output)
     }
 
     numbers.clear();
-    string = SkipField(string, "colorIndex [");
-    string = ParseList(string, &numbers);
-    CHECK_RET(*string != '\0');
+    pos = string.find("colorIndex [", pos);
+    CHECK_RET(pos != std::string::npos);
+    pos = ParseList(string, pos + 12, &numbers);
+    CHECK_RET(pos != string.size());
     for (auto i = 0; i != numbers.size(); ++i)
     {
         output->colorIdxs.push_back((size_t)numbers.at(i));
     }
 
     numbers.clear();
-    string = SkipField(string, "coordIndex [");
-    string = ParseList(string, &numbers);
-    CHECK_RET(*string != '\0');
-    for (auto i = 0; i != numbers.size(); ++i)
+    pos = string.find("coordIndex [", pos);
+    CHECK_RET(pos != std::string::npos);
+    pos = ParseList(string, pos + 12, &numbers);
+    CHECK_RET(pos != string.size());
+    for (auto i = 0; i != numbers.size(); i += 4)
     {
-        output->coordIdxs.push_back((size_t)numbers.at(i));
+        output->coordIdxs.push_back((size_t)numbers.at(i    ));
+        output->coordIdxs.push_back((size_t)numbers.at(i + 1));
+        output->coordIdxs.push_back((size_t)numbers.at(i + 2));
     }
 
     numbers.clear();
-    string = SkipField(string, "vector [");
-    string = ParseList(string, &numbers);
-    CHECK_RET(*string != '\0');
-    for (auto i = 0; i != numbers.size() / 3; i += 3)
+    pos = string.find("vector [", pos);
+    CHECK_RET(pos != std::string::npos);
+    pos = ParseList(string, pos + 8, &numbers);
+    CHECK_RET(pos != string.size());
+    for (auto i = 0; i != numbers.size(); i += 3)
     {
         output->normals.emplace_back(numbers.at(i),
                                      numbers.at(i + 1),
-                                     numbers.at(i + 2));
+                                     -numbers.at(i + 2));
     }
 
     numbers.clear();
-    string = SkipField(string, "normalIndex [");
-    string = ParseList(string, &numbers);
-    CHECK_RET(*string != '\0');
+    pos = string.find("normalIndex [", pos);
+    CHECK_RET(pos != std::string::npos);
+    pos = ParseList(string, pos + 13, &numbers);
+    CHECK_RET(pos != string.size());
     for (auto i = 0; i != numbers.size(); ++i)
     {
         output->normalIdxs.push_back((size_t)numbers.at(i));
@@ -82,36 +107,42 @@ bool FileVRML::Parse(const char * string, VRML * output)
     return true;
 }
 
-const char * FileVRML::SkipSpace(const char * string)
+size_t FileVRML::SkipSpace(const std::string & string, size_t pos)
 {
-    for (; *string != '\0' && *string <= 32; ++string)
+    for (; string.size() != pos && string.at(pos) <= 32; ++pos)
         ;
-    return string;
+    return pos;
 }
 
-const char * FileVRML::SkipField(const char * string, const char * field)
-{
-    assert(field != nullptr);
-    for (; *string != '\0' && std::strcmp(string, field) != 0; ++string)
-        ;
-    return string;
-}
-
-const char * FileVRML::ParseList(const char * string, std::vector<float>* output)
+size_t FileVRML::ParseList(const std::string & string, size_t pos, std::vector<float>* output)
 {
     size_t index = 0;
     char number[32] = { 0 };
-    string = SkipSpace(string);
-    while (*string != ']')
+    pos = SkipSpace(string, pos);
+    while (string.size() != pos && string.at(pos) != ']')
     {
-        number[index++] = *string;
-        if (*string == ',')
+        switch (string.at(pos))
         {
-            output->push_back(std::strtof(number, nullptr));
-            string = SkipSpace(string + 1);
-            memset(number, 0, 32);
-            index = 0;
+        case ',':
+        case ' ':
+            {
+                output->push_back(std::strtof(number, nullptr));
+                pos = SkipSpace(string, pos + 1);
+                memset(number, 0, 32);
+                index = 0;
+            }
+            break;
+        case '\n':
+            {
+                pos = SkipSpace(string, pos + 1);
+            }
+            break;
+        default:
+            {
+                number[index++] = string.at(pos++);
+            }
+            break;
         }
     }
-    return string;
+    return pos;
 }

@@ -1,35 +1,28 @@
 #include "file.h"
+#include "file_vrml.h"
 #include <string_view>
-
-File::File()
-{
-}
-
-File::~File()
-{
-}
 
 bool File::LoadMesh(const std::string & fname, Mesh * mesh)
 {
-    if (!CheckSuffix(fname, ".json"))
+    if (CheckSuffix(fname, ".wrl"))
     {
-        return false;
+        FileVRML fvrml;
+        return fvrml.LoadMesh(fname, mesh);
     }
-
-    return true;
+    return false;
 }
 
-std::string File::LoadFile(const std::string & fname) const
+std::string File::GetFileString(const std::string & fname)
 {
     std::ifstream ifile(fname);
     if (ifile)
     {
-        return std::move(LoadFile(ifile));
+        return std::move(GetFileString(ifile));
     }
     return std::string();
 }
 
-size_t File::GetFileSize(const std::string & fname) const
+size_t File::GetFileSize(const std::string & fname)
 {
     std::ifstream ifile(fname);
     if (ifile)
@@ -39,7 +32,7 @@ size_t File::GetFileSize(const std::string & fname) const
     return (size_t)~0;
 }
 
-size_t File::GetFileSize(std::ifstream & ifile) const
+size_t File::GetFileSize(std::ifstream & ifile)
 {
     auto tell = ifile.tellg();
     ifile.seekg(0, std::ios::end);
@@ -48,10 +41,10 @@ size_t File::GetFileSize(std::ifstream & ifile) const
     return (size_t)size;
 }
 
-std::string File::LoadFile(std::ifstream & ifile) const
+std::string File::GetFileString(std::ifstream & ifile)
 {
     auto size = GetFileSize(ifile);
-    std::string buffer('\0', size);
+    std::string buffer(size, '\0');
     ifile.read(&buffer[0], size);
     return std::move(buffer);
 }

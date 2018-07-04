@@ -19,8 +19,7 @@ public:
     bool LoadMesh(const std::string & fname, Mesh * mesh);
 
 private:
-    bool Parse(const char * string, VRML * output);
-    const char * SkipSpace(const char * string);
-    const char * SkipField(const char * string, const char * field);
-    const char * ParseList(const char * string, std::vector<float> * output);
+    bool Parse(const std::string & string, VRML * output);
+    size_t SkipSpace(const std::string & string, size_t pos);
+    size_t ParseList(const std::string & string, size_t pos, std::vector<float> * output);
 };
