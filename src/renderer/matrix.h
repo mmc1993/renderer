@@ -19,15 +19,15 @@ public:
 	Matrix4x4 operator *(const Matrix4x4 & v) const
 	{
 		Matrix4x4 mat;
-		for (auto y = 0; y != 4; ++y)
-		{
-			for (auto x = 0; x != 4; ++x)
-			{
+        for (auto x = 0; x != 4; ++x)
+        {
+		    for (auto y = 0; y != 4; ++y)
+		    {
 				mat.m[x][y] 
-					= m[0][y] * v.m[x][0]
-					+ m[1][y] * v.m[x][1]
-					+ m[2][y] * v.m[x][2]
-					+ m[3][y] * v.m[x][3];
+					= m[x][0] * v.m[0][y]
+					+ m[x][1] * v.m[1][y]
+					+ m[x][2] * v.m[2][y]
+					+ m[x][3] * v.m[3][y];
 			}
 		}
 		return mat;
