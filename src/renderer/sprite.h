@@ -5,6 +5,7 @@
 #include "vec4.h"
 #include "mesh.h"
 #include "material.h"
+#include "renderer.h"
 
 class Sprite {
 public:
@@ -12,6 +13,9 @@ public:
         Transform()
         {
             change = true;
+            sx = sy = sz = 1;
+            px = py = pz = 0;
+            rx = ry = rz = 0;
         }
         bool change;
         float sx, sy, sz;
@@ -20,48 +24,69 @@ public:
         Matrix4x4 transform;
     };
 public:
-    const Mesh & GetMesh() const
+    void SetMesh(Mesh * pMesh)
     {
-        return const_cast<Sprite *>(this)->GetMesh();
+        _mesh = pMesh;
     }
 
-    const Material & GetMaterial() const
+    void SetMaterial(Material * pMaterial)
     {
-        return const_cast<Sprite *>(this)->GetMaterial();
+        _material = pMaterial;
     }
 
-    const Mesh & GetMesh()
+    void SetCoord(float x, float y, float z)
     {
-        return *_pMesh;
+        _transform.px = x;
+        _transform.py = y;
+        _transform.pz = z;
+        _transform.change = true;
     }
 
-    const Material & GetMaterial()
+    void SetRotateX(float x)
     {
-        return *_pMaterial;
+        _transform.rx = x;
+        _transform.change = true;
     }
 
-    void SetMesh(std::shared_ptr<Mesh> pMesh)
+    void SetRotateY(float y)
     {
-        _pMesh = pMesh;
+        _transform.ry = y;
+        _transform.change = true;
     }
 
-    void SetMaterial(std::shared_ptr<Material> pMaterial)
+    void SetRotateZ(float z)
     {
-        _pMaterial = pMaterial;
+        _transform.rz = z;
+        _transform.change = true;
     }
 
-    void SetCoord(float x, float y, float z);
-    void SetRotateX(float x);
-    void SetRotateY(float y);
-    void SetRotateZ(float z);
-    void SetScale(float s);
+    void SetRotate(float x, float y, float z)
+    {
+        _transform.rx = x;
+        _transform.ry = y;
+        _transform.rz = z;
+        _transform.change = true;
+    }
 
-    virtual void OnDraw();
+    void SetScale(float s)
+    {
+        _transform.sx = s;
+        _transform.sy = s;
+        _transform.sz = s;
+        _transform.change = true;
+    }
+
+    const Transform & GetTransform() const
+    {
+        return _transform;
+    }
+
+    virtual void OnDraw(Renderer * renderer);
 
 private:
     Transform _transform;
 
-    std::shared_ptr<Mesh> _pMesh;
+    Material * _material;
 
-    std::shared_ptr<Material> _pMaterial;
+    Mesh * _mesh;
 };

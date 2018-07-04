@@ -121,10 +121,10 @@ public:
 
     void Primitive(Mesh * mesh, Material * material);
 
-	std::uint32_t GetBufferW() { return _bufferWH.w; }
-	std::uint32_t GetBufferH() { return _bufferWH.h; }
-	const std::unique_ptr<std::uint32_t[]> & GetFBufferPtr() { return _buffer.frame; }
-    const std::unique_ptr<std::uint32_t[]> & GetZBufferPtr() { return _buffer.zorder; }
+	std::uint32_t GetBufferW() const { return _bufferWH.w; }
+	std::uint32_t GetBufferH() const { return _bufferWH.h; }
+	const std::unique_ptr<std::uint32_t[]> & GetFBufferPtr() const { return _buffer.frame; }
+    const std::unique_ptr<std::uint32_t[]> & GetZBufferPtr() const { return _buffer.zorder; }
 
 private:
 	void Primitive(Vertex v1, Vertex v2, Vertex v3);
