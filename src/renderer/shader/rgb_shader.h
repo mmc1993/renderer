@@ -1,16 +1,15 @@
 #pragma once
 
 #include "shader.h"
-#include "texture.h"
 
 class RGBShader : public Shader {
-    virtual Vec4 VertexFunc(Param & param) override
+    virtual void VertexFunc(PipelineParam & param) override
     {
-        return Shader::VertexFunc(param);
+        param.outv = param.v * param.mvp;
     }
 
-    virtual std::uint32_t FragmentFunc(Param & param) override
+    virtual void FragmentFunc(PipelineParam & param) override
     {
-        return Shader::FragmentFunc(param);
+        param.outc = param.c;
     }
 };
