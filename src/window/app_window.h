@@ -2,9 +2,11 @@
 
 #include "window.h"
 
-#include "../renderer/texture.h"
 #include "../renderer/renderer.h"
-#include "../renderer/shader/tex_shader.h"
+#include "../renderer/material.h"
+#include "../renderer/texture.h"
+#include "../renderer/mesh.h"
+#include "../renderer/shader/rgb_shader.h"
 
 class AppWindow: public Window {
 public:
@@ -22,8 +24,8 @@ private:
 	float _cubeRotateX;
 	float _cubeRotateY;
     
-    Texture _textures[4];
-    TexShader _texShader;
-
+    Mesh _mesh;
+    Material _material;
 	Renderer _renderer;
+    RGBShader _rgbShader;
 };
