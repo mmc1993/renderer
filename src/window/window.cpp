@@ -116,9 +116,11 @@ void Window::InitBuffer()
     SelectObject(_bufferDC, _bufferBM);
 }
 
-void Window::FromRenderer(Renderer * prd)
+void Window::FromRenderer(const Renderer & renderer)
 {
-    memcpy(_pBufferBM, prd->GetFBufferPtr().get(), GetWidth() * GetHeight() * 4);
+    memcpy(_pBufferBM, 
+           renderer.GetFBufferPtr().get(), 
+           GetWidth() * GetHeight() * 4);
 
 	auto hdc = GetDC(_hwnd);
 	BitBlt(hdc, 0, 0, GetWidth(), GetHeight(), _bufferDC, 0, 0, SRCCOPY);

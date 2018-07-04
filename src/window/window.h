@@ -22,7 +22,7 @@ public:
 	HWND GetHwnd() { return _hwnd; }
 
 	void InitBuffer();
-	void FromRenderer(Renderer * prd);
+	void FromRenderer(const Renderer & renderer);
 
 protected:
 	virtual void OnMessage(UINT uint, WPARAM wparam, LPARAM lparam) = 0;
