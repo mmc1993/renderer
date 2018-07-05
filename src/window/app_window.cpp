@@ -25,15 +25,16 @@ void AppWindow::OnMessage(UINT uint, WPARAM wparam, LPARAM lparam)
 
             //  加载纹理
             Material material;
-            material.BindShader(&_rgbShader);
+            material.BindShader(RGBShader());
 
             _materialCache.Bind("res/material1", material);
 
             //  加载网格
             _meshCache.Load("res/1.wrl");
+            _meshCache.Load("res/2.wrl");
 
             //  创建精灵
-            _sprite.SetCoord(0, 0, 25);
+            _sprite.SetCoord(0, 0, 15);
             _sprite.SetMesh(_meshCache.Get("res/1.wrl"));
             _sprite.SetMaterial(_materialCache.Get("res/material1"));
 		}
@@ -50,7 +51,7 @@ void AppWindow::OnMessage(UINT uint, WPARAM wparam, LPARAM lparam)
 		{
             _renderer.SetFar(2000);
             _renderer.SetLineRGB(RGB(255, 255, 255));
-            _renderer.SetDrawMode(/*Renderer::kLINE | */Renderer::kFILL | Renderer::kCOLOR);
+            _renderer.SetDrawMode(Renderer::kLINE | Renderer::kFILL | Renderer::kCOLOR);
 			_renderer.SetBufferSize(GetWidth(), GetHeight());
 			_renderer.SetViewPort(0, 0, GetWidth(), GetHeight());
 			_renderer.LookAt({ 0, 0, 0 }, { 0, 1, 0 }, { 0, 0, 1 });
