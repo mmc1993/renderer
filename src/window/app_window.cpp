@@ -18,14 +18,14 @@ void AppWindow::OnMessage(UINT uint, WPARAM wparam, LPARAM lparam)
 			SetTimer(GetHwnd(), 1001, 33, nullptr);
 			_cubePoint.x = 0;
 			_cubePoint.y = 0;
-			_cubePoint.z = 25;
+			_cubePoint.z = 5;
 
             _cubeRotateX = -0;
             _cubeRotateY = -0;
 
             //  加载纹理
             Material material;
-            material.BindShader(&_rgbShader);
+            material.BindShader(RGBShader());
 
             _materialCache.Bind("res/material1", material);
 
@@ -33,7 +33,7 @@ void AppWindow::OnMessage(UINT uint, WPARAM wparam, LPARAM lparam)
             _meshCache.Load("res/1.wrl");
 
             //  创建精灵
-            _sprite.SetCoord(0, 0, 25);
+            _sprite.SetCoord(0, 0, 10);
             _sprite.SetMesh(_meshCache.Get("res/1.wrl"));
             _sprite.SetMaterial(_materialCache.Get("res/material1"));
 		}

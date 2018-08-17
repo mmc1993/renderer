@@ -291,7 +291,7 @@ void Renderer::VertexShader(const Vertex & v, Vec4 * outv)
     _render.param.n = v.normal;
     _render.param.uv.u = v.u;
     _render.param.uv.v = v.v;
-    _render.material->GetShader()->VertexFunc(_render.param);
+    _render.material->GetShader().VertexFunc(_render.param);
     *outv = _render.param.outv;
 }
 
@@ -302,7 +302,7 @@ void Renderer::FragmentShader(const Vertex & v, Color * outc)
     _render.param.n = v.normal;
     _render.param.uv.u = v.u;
     _render.param.uv.v = v.v;
-    _render.material->GetShader()->FragmentFunc(_render.param);
+    _render.material->GetShader().FragmentFunc(_render.param);
     *outc = _render.param.outc;
 }
 

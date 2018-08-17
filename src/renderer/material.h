@@ -4,16 +4,16 @@
 
 class Material {
 public:
-    void BindShader(Shader * shader)
+    void BindShader(const Shader & shader)
     {
         _shader = shader;
     }
 
-    Shader * GetShader()
+    Shader & GetShader()
     {
         return _shader;
     }
 
 private:
-    Shader * _shader;
+    Shader _shader;
 };
