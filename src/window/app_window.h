@@ -28,7 +28,7 @@ private:
 	float _cubeRotateY;
     
 
-    Sprite _sprite;
+    Sprite _root;
     Renderer _renderer;
     MeshCache _meshCache;
     MaterialCache _materialCache;

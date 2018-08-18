@@ -6,7 +6,8 @@
 
 class Vertex {
 public:
-    Vec4 pt;
+    Vec4 world;
+    Vec4 coord;
     Color color;
     Vec4 normal;
     float u;
@@ -14,36 +15,39 @@ public:
 
     Vertex operator -(const Vertex & v) const
     {
-        Vertex vert;
-        vert.u = u - v.u;
-        vert.v = u - v.v;
-        vert.pt = pt - v.pt;
-        vert.color = color - v.color;
+        Vertex vert = *this;
+        vert.u -= v.u;
+        vert.v -= v.v;
+        vert.coord -= v.coord;
+        vert.world -= v.world;
+        vert.color -= v.color;
         return vert;
     }
 
     Vertex operator +(const Vertex & v) const
     {
-        Vertex vert;
-        vert.u = u + v.u;
-        vert.v = u + v.v;
-        vert.pt = pt + v.pt;
-        vert.color = color + v.color;
+        Vertex vert = *this;
+        vert.u += v.u;
+        vert.v += v.v;
+        vert.coord += v.coord;
+        vert.world += v.world;
+        vert.color += v.color;
         return vert;
     }
 
     Vertex operator *(float v) const
     {
-        Vertex vert;
+        Vertex vert = *this;
         vert.u = u * v;
         vert.v = u * v;
-        vert.pt = pt * v;
+        vert.coord = coord * v;
+        vert.world = world * v;
         vert.color = color * v;
         return vert;
     }
 
-    Vertex LerpFromY(const Vertex & v, float y) const
+    Vertex LerpFromY(const Vertex & v, float y) const&
     {
-        return Math::Lerp(*this, v, 1.0f / (v.pt.y - pt.y) * y);
+        return Math::Lerp(*this, v, 1.0f / (v.coord.y - coord.y) * y);
     }
 };

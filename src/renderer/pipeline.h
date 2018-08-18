@@ -10,6 +10,7 @@ class Material;
 
 struct PipelineParam {
     struct { float u, v; } uv;
+    Vec4 caemraPos;     //  相机坐标
     Vec4 v;             //  顶点坐标
     Vec4 n;             //  顶点法线
     Color c;            //  顶点颜色

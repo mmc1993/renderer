@@ -21,22 +21,33 @@ void AppWindow::OnMessage(UINT uint, WPARAM wparam, LPARAM lparam)
 			_cubePoint.z = 25;
 
             _cubeRotateX = -0;
-            _cubeRotateY = -0;
+            _cubeRotateY = -90;
 
             //  加载纹理
             Material material;
-            material.BindShader(RGBShader());
+            material.BindShader(new RGBShader());
 
             _materialCache.Bind("res/material1", material);
 
             //  加载网格
             _meshCache.Load("res/1.wrl");
             _meshCache.Load("res/2.wrl");
+            _meshCache.Load("res/3.wrl");
+
+            _root.SetRotateY(90);
+            _root.SetCoord(0, 0, 15);
+            _root.SetMesh(_meshCache.Get("res/3.wrl"));
+            _root.SetMaterial(_materialCache.Get("res/material1"));
 
             //  创建精灵
-            _sprite.SetCoord(0, 0, 15);
-            _sprite.SetMesh(_meshCache.Get("res/1.wrl"));
-            _sprite.SetMaterial(_materialCache.Get("res/material1"));
+            for (auto i = 0; i != 1; ++i)
+            {
+                auto sprite = new Sprite();
+                sprite->SetCoord((i + 1) * 2.0f, 0, 0);
+                sprite->SetMesh(_meshCache.Get("res/3.wrl"));
+                sprite->SetMaterial(_materialCache.Get("res/material1"));
+                _root.AddChild(sprite);
+            }
 		}
 		break;
 	case WM_TIMER:
@@ -51,7 +62,7 @@ void AppWindow::OnMessage(UINT uint, WPARAM wparam, LPARAM lparam)
 		{
             _renderer.SetFar(2000);
             _renderer.SetLineRGB(RGB(255, 255, 255));
-            _renderer.SetDrawMode(Renderer::kLINE | Renderer::kFILL | Renderer::kCOLOR);
+            _renderer.SetDrawMode(/*Renderer::kLINE | */Renderer::kFILL/* | Renderer::kCOLOR*/);
 			_renderer.SetBufferSize(GetWidth(), GetHeight());
 			_renderer.SetViewPort(0, 0, GetWidth(), GetHeight());
 			_renderer.LookAt({ 0, 0, 0 }, { 0, 1, 0 }, { 0, 0, 1 });
@@ -64,22 +75,22 @@ void AppWindow::OnRender()
 {
 	if (GetAsyncKeyState('W') != 0)
 	{
-        _sprite.SetRotateX(_sprite.GetTransform().rx + 0.1f);
+        _root.SetRotateX(_root.GetTransform().rx + 0.1f);
 	}
 	if (GetAsyncKeyState('S') != 0)
 	{
-        _sprite.SetRotateX(_sprite.GetTransform().rx - 0.1f);
+        _root.SetRotateX(_root.GetTransform().rx - 0.1f);
 	}
 	if (GetAsyncKeyState('A') != 0)
 	{
-        _sprite.SetRotateY(_sprite.GetTransform().ry + 0.1f);
+        _root.SetRotateY(_root.GetTransform().ry + 0.1f);
 	}
 	if (GetAsyncKeyState('D') != 0)
 	{
-        _sprite.SetRotateY(_sprite.GetTransform().ry - 0.1f);
+        _root.SetRotateY(_root.GetTransform().ry - 0.1f);
 	}
 
     _renderer.Clear(0, 0, 0);
-    _sprite.OnDraw(&_renderer);
+    _root.OnDraw(&_renderer);
     FromRenderer(_renderer);
 }

@@ -66,6 +66,16 @@ public:
         return Color(r / v, g / v, b / v, a / v);
     }
 
+    Color & operator -=(const Color & color)
+    {
+        return (*this = *this - color);
+    }
+
+    Color & operator +=(const Color & color)
+    {
+        return (*this = *this + color);
+    }
+
     std::uint32_t ToRGBA() const
     {
         return Color::ToRGBA(r, g, b, a);

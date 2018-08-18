@@ -108,26 +108,32 @@ void Renderer::Primitive(Mesh * mesh, Material * material)
 void Renderer::Primitive(Vertex v1, Vertex v2, Vertex v3)
 {
     //  裁剪
-    VertexShader(v1, &v1.pt);
-    if (CheckViewCut(v1.pt) != 0) { return; }
-    VertexShader(v2, &v2.pt);
-    if (CheckViewCut(v2.pt) != 0) { return; }
-    VertexShader(v3, &v3.pt);
-    if (CheckViewCut(v3.pt) != 0) { return; }
+    VertexShader(v1, &v1.coord);
+    if (CheckViewCut(v1.coord) != 0) { return; }
+    VertexShader(v2, &v2.coord);
+    if (CheckViewCut(v2.coord) != 0) { return; }
+    VertexShader(v3, &v3.coord);
+    if (CheckViewCut(v3.coord) != 0) { return; }
 
     //  背面剔除
-    if (!CheckBackCut(v1.pt, v2.pt, v3.pt, &v1.normal)) { return; }
+    if (!CheckBackCut(v1.coord, v2.coord, v3.coord, &v1.normal)) { return; }
     v2.normal = v1.normal;
     v3.normal = v1.normal;
 
-    v1.pt.x /= v1.pt.w; v1.pt.y /= v1.pt.w; v1.pt.w /= v1.pt.w;
-    v2.pt.x /= v2.pt.w; v2.pt.y /= v2.pt.w; v2.pt.w /= v2.pt.w;
-    v3.pt.x /= v3.pt.w; v3.pt.y /= v3.pt.w; v3.pt.w /= v3.pt.w;
+    //  这里可以通过延后 / w, 跳过这一步, 但是我想赶紧结束这个项目, 所以将就一下算了.
+    //  保存世界坐标
+    v1.world = v1.coord;
+    v2.world = v2.coord;
+    v3.world = v3.coord;
+
+    v1.coord.x /= v1.coord.w; v1.coord.y /= v1.coord.w; v1.coord.w /= v1.coord.w;
+    v2.coord.x /= v2.coord.w; v2.coord.y /= v2.coord.w; v2.coord.w /= v2.coord.w;
+    v3.coord.x /= v3.coord.w; v3.coord.y /= v3.coord.w; v3.coord.w /= v3.coord.w;
 
     //  变换到平面坐标
-    v1.pt *= _transform.screen;
-    v2.pt *= _transform.screen;
-    v3.pt *= _transform.screen;
+    v1.coord *= _transform.screen;
+    v2.coord *= _transform.screen;
+    v3.coord *= _transform.screen;
 
     if (_drawMode & DrawMode::kFILL)
     {
@@ -136,28 +142,28 @@ void Renderer::Primitive(Vertex v1, Vertex v2, Vertex v3)
 
     if (_drawMode & DrawMode::kLINE)
     {
-        DrawLine(v1.pt.x, v1.pt.y, v2.pt.x, v2.pt.y);
-        DrawLine(v2.pt.x, v2.pt.y, v3.pt.x, v3.pt.y);
-        DrawLine(v3.pt.x, v3.pt.y, v1.pt.x, v1.pt.y);
+        DrawLine(v1.coord.x, v1.coord.y, v2.coord.x, v2.coord.y);
+        DrawLine(v2.coord.x, v2.coord.y, v3.coord.x, v3.coord.y);
+        DrawLine(v3.coord.x, v3.coord.y, v1.coord.x, v1.coord.y);
     }
 }
 
 void Renderer::DrawTriangle(const Vertex & v1, const Vertex & v2, const Vertex & v3)
 {
     const Vertex * pVert[3] = { nullptr, nullptr, nullptr };
-    if (v1.pt.y == v2.pt.y)
+    if (v1.coord.y == v2.coord.y)
     {
         pVert[0] = &v3;
         pVert[1] = &v1;
         pVert[2] = &v2;
     }
-    else if (v1.pt.y == v3.pt.y)
+    else if (v1.coord.y == v3.coord.y)
     {
         pVert[0] = &v2;
         pVert[1] = &v1;
         pVert[2] = &v3;
     }
-    else if (v2.pt.y == v3.pt.y)
+    else if (v2.coord.y == v3.coord.y)
     {
         pVert[0] = &v1;
         pVert[1] = &v2;
@@ -166,39 +172,39 @@ void Renderer::DrawTriangle(const Vertex & v1, const Vertex & v2, const Vertex &
     else
     {
         Vertex verts[3];
-        if (v1.pt.y > v2.pt.y && v1.pt.y > v3.pt.y)
+        if (v1.coord.y > v2.coord.y && v1.coord.y > v3.coord.y)
         {
             verts[0] = v1;
-            verts[1] = v2.pt.y > v3.pt.y ? v2 : v3;
-            verts[2] = v2.pt.y > v3.pt.y ? v3 : v2;
+            verts[1] = v2.coord.y > v3.coord.y ? v2 : v3;
+            verts[2] = v2.coord.y > v3.coord.y ? v3 : v2;
         }
-        else if (v2.pt.y > v1.pt.y && v2.pt.y > v3.pt.y)
+        else if (v2.coord.y > v1.coord.y && v2.coord.y > v3.coord.y)
         {
             verts[0] = v2;
-            verts[1] = v1.pt.y > v3.pt.y ? v1 : v3;
-            verts[2] = v1.pt.y > v3.pt.y ? v3 : v1;
+            verts[1] = v1.coord.y > v3.coord.y ? v1 : v3;
+            verts[2] = v1.coord.y > v3.coord.y ? v3 : v1;
         }
-        else if (v3.pt.y > v1.pt.y && v3.pt.y > v2.pt.y)
+        else if (v3.coord.y > v1.coord.y && v3.coord.y > v2.coord.y)
         {
             verts[0] = v3;
-            verts[1] = v1.pt.y > v2.pt.y ? v1 : v2;
-            verts[2] = v1.pt.y > v2.pt.y ? v2 : v1;
+            verts[1] = v1.coord.y > v2.coord.y ? v1 : v2;
+            verts[2] = v1.coord.y > v2.coord.y ? v2 : v1;
         }
         auto vert4 = verts[0].LerpFromY(verts[2], 
-                                        verts[1].pt.y - verts[0].pt.y);
-        vert4.pt.y = verts[1].pt.y;
+                                        verts[1].coord.y - verts[0].coord.y);
+        vert4.coord.y = verts[1].coord.y;
         DrawTriangle(verts[0], vert4, verts[1]);
         DrawTriangle(verts[1], vert4, verts[2]);
     }
 
     if (pVert[0] != nullptr || pVert[1] != nullptr || pVert[2] != nullptr)
     {
-        if (pVert[1]->pt.x > pVert[2]->pt.x)
+        if (pVert[1]->coord.x > pVert[2]->coord.x)
         {
             std::swap(pVert[1], pVert[2]);
         }
 
-        if (pVert[0]->pt.y < pVert[1]->pt.y)
+        if (pVert[0]->coord.y < pVert[1]->coord.y)
         {
             DrawTriangleTop(pVert);
         }
@@ -211,7 +217,7 @@ void Renderer::DrawTriangle(const Vertex & v1, const Vertex & v2, const Vertex &
 
 void Renderer::DrawTriangleBottom(const Vertex ** pVert)
 {
-    auto dy = pVert[1]->pt.y - pVert[0]->pt.y;
+    auto dy = pVert[1]->coord.y - pVert[0]->coord.y;
     for (auto y = 0; y >= dy; --y)
     {
         auto start = pVert[0]->LerpFromY(*pVert[1], (float)y);
@@ -222,7 +228,7 @@ void Renderer::DrawTriangleBottom(const Vertex ** pVert)
 
 void Renderer::DrawTriangleTop(const Vertex ** pVert)
 {
-    auto dy = pVert[1]->pt.y - pVert[0]->pt.y;
+    auto dy = pVert[1]->coord.y - pVert[0]->coord.y;
     for (auto y = dy; y >=0; --y)
     {
         auto start = pVert[0]->LerpFromY(*pVert[1], (float)y);
@@ -233,8 +239,9 @@ void Renderer::DrawTriangleTop(const Vertex ** pVert)
 
 void Renderer::DrawScanLine(const Vertex & start, const Vertex & end)
 {
-    auto w = std::ceil(end.pt.x - start.pt.x);
+    auto w = std::ceil(end.coord.x - start.coord.x);
     auto cs = (end.color - start.color) / w;
+    auto ws = (end.world - start.world) / w;
     auto us = (end.u - start.u) / w;
     auto vs = (end.v - start.v) / w;
     auto vert = start;
@@ -243,8 +250,9 @@ void Renderer::DrawScanLine(const Vertex & start, const Vertex & end)
         DrawPoint(vert);
         vert.u = vert.u + us;
         vert.v = vert.v + vs;
-        vert.pt.x = vert.pt.x + 1.0f;
+        vert.world = vert.world + ws;
         vert.color = vert.color + cs;
+        vert.coord.x = vert.coord.x + 1.0f;
     }
 }
 
@@ -266,9 +274,9 @@ void Renderer::DrawLine(float x1, float y1, float x2, float y2)
 
 inline void Renderer::DrawPoint(const Vertex & vert)
 {
-    auto index = _buffer.ToIndex(vert.pt.x, vert.pt.y, _bufferWH.w);
+    auto index = _buffer.ToIndex(vert.coord.x, vert.coord.y, _bufferWH.w);
     assert(index < _bufferWH.Product());
-    if (vert.pt.z < _buffer.zorder[index])
+    if (vert.coord.z < _buffer.zorder[index])
     {
         Color color;
         if (kCOLOR & _drawMode)
@@ -280,28 +288,31 @@ inline void Renderer::DrawPoint(const Vertex & vert)
             FragmentShader(vert, &color);
         }
         _buffer.frame[index] = color.ToRGBA();
-        _buffer.zorder[index] = static_cast<std::uint32_t>(vert.pt.z);
+        _buffer.zorder[index] = static_cast<std::uint32_t>(vert.coord.z);
     }
 }
 
 void Renderer::VertexShader(const Vertex & v, Vec4 * outv)
 {
-    _render.param.v = v.pt;
+    _render.param.v = v.coord;
     _render.param.c = v.color;
     _render.param.n = v.normal;
     _render.param.uv.u = v.u;
     _render.param.uv.v = v.v;
+    _render.param.caemraPos = _camera.eye;
     _render.material->GetShader().VertexFunc(_render.param);
     *outv = _render.param.outv;
 }
 
 void Renderer::FragmentShader(const Vertex & v, Color * outc)
 {
-    _render.param.v = v.pt;
+    _render.param.v = v.coord;
     _render.param.c = v.color;
     _render.param.n = v.normal;
     _render.param.uv.u = v.u;
     _render.param.uv.v = v.v;
+    _render.param.outv = v.world;
+    _render.param.caemraPos = _camera.eye;
     _render.material->GetShader().FragmentFunc(_render.param);
     *outc = _render.param.outc;
 }
@@ -322,7 +333,7 @@ inline bool Renderer::CheckBackCut(const Vec4 & p1, const Vec4 & p2, const Vec4 
 {
     auto normal = (p2 - p1).Cross(p3 - p2);
     auto direct = (p1 - _camera.eye);
-    if (normal.Dot(direct) < 0)
+    if (normal.Dot(direct) >= 0)
     {
         return false;
     }

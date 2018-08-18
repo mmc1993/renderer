@@ -20,7 +20,4 @@ public:
         }
         return true;
     }
-
-private:
-    std::unordered_map<std::string, Mesh> _cache;
 };

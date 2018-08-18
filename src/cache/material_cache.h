@@ -13,7 +13,4 @@ public:
         }
         return true;
     }
-
-private:
-    std::unordered_map<std::string, Material> _cache;
 };

@@ -13,17 +13,14 @@ bool FileVRML::LoadMesh(const std::string & fname, Mesh * mesh)
         for (auto i = 0; i != vrml.coordIdxs.size() / 3; ++i)
         {
             Vertex v0, v1, v2;
-            v0.pt = vrml.coords.at(vrml.coordIdxs.at(i * 3));
-            v1.pt = vrml.coords.at(vrml.coordIdxs.at(i * 3 + 1));
-            v2.pt = vrml.coords.at(vrml.coordIdxs.at(i * 3 + 2));
+            v0.coord = vrml.coords.at(vrml.coordIdxs.at(i * 3));
+            v1.coord = vrml.coords.at(vrml.coordIdxs.at(i * 3 + 1));
+            v2.coord = vrml.coords.at(vrml.coordIdxs.at(i * 3 + 2));
 
             v0.color = vrml.colors.at(vrml.colorIdxs.at(i));
             v1.color = vrml.colors.at(vrml.colorIdxs.at(i));
             v2.color = vrml.colors.at(vrml.colorIdxs.at(i));
 
-            v0.normal = vrml.normals.at(vrml.normalIdxs.at(i));
-            v1.normal = vrml.normals.at(vrml.normalIdxs.at(i));
-            v2.normal = vrml.normals.at(vrml.normalIdxs.at(i));
             mesh->AddVertexs(v0, v1, v2);
         }
         return true;
@@ -42,9 +39,9 @@ bool FileVRML::Parse(const std::string & string, VRML * output)
     CHECK_RET(pos != string.size());
     for (auto i = 0; i != numbers.size(); i += 3)
     {
-        //  x z y => x y z
-        output->coords.emplace_back(numbers.at(i    ), 
-                                    numbers.at(i + 1), 
+        //  y, x, z
+        output->coords.emplace_back(numbers.at(i + 1), 
+                                    numbers.at(i + 0), 
                                     -numbers.at(i + 2));
     }
 
@@ -80,28 +77,6 @@ bool FileVRML::Parse(const std::string & string, VRML * output)
         output->coordIdxs.push_back((size_t)numbers.at(i    ));
         output->coordIdxs.push_back((size_t)numbers.at(i + 1));
         output->coordIdxs.push_back((size_t)numbers.at(i + 2));
-    }
-
-    numbers.clear();
-    pos = string.find("vector [", pos);
-    CHECK_RET(pos != std::string::npos);
-    pos = ParseList(string, pos + 8, &numbers);
-    CHECK_RET(pos != string.size());
-    for (auto i = 0; i != numbers.size(); i += 3)
-    {
-        output->normals.emplace_back(numbers.at(i),
-                                     numbers.at(i + 1),
-                                     -numbers.at(i + 2));
-    }
-
-    numbers.clear();
-    pos = string.find("normalIndex [", pos);
-    CHECK_RET(pos != std::string::npos);
-    pos = ParseList(string, pos + 13, &numbers);
-    CHECK_RET(pos != string.size());
-    for (auto i = 0; i != numbers.size(); ++i)
-    {
-        output->normalIdxs.push_back((size_t)numbers.at(i));
     }
 
     return true;

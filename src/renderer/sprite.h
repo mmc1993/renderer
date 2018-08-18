@@ -24,6 +24,20 @@ public:
         Matrix4x4 transform;
     };
 public:
+    void AddChild(Sprite * child)
+    {
+        _childs.push_back(child);
+    }
+
+    void DelChild(Sprite * child)
+    {
+        auto it = std::remove(_childs.begin(), _childs.end(), child);
+        if (it != _childs.end())
+        {
+            _childs.erase(it);
+        }
+    }
+
     void SetMesh(Mesh * pMesh)
     {
         _mesh = pMesh;
@@ -81,9 +95,13 @@ public:
         return _transform;
     }
 
-    virtual void OnDraw(Renderer * renderer);
+    virtual void OnDraw(Renderer * renderer, const Matrix4x4 * parent = nullptr);
 
 private:
+
+private:
+    std::vector<Sprite *> _childs;
+
     Transform _transform;
 
     Material * _material;
