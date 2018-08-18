@@ -18,7 +18,7 @@ void AppWindow::OnMessage(UINT uint, WPARAM wparam, LPARAM lparam)
 			SetTimer(GetHwnd(), 1001, 33, nullptr);
 			_cubePoint.x = 0;
 			_cubePoint.y = 0;
-			_cubePoint.z = 5;
+			_cubePoint.z = 25;
 
             _cubeRotateX = -0;
             _cubeRotateY = -0;
@@ -31,9 +31,10 @@ void AppWindow::OnMessage(UINT uint, WPARAM wparam, LPARAM lparam)
 
             //  加载网格
             _meshCache.Load("res/1.wrl");
+            _meshCache.Load("res/2.wrl");
 
             //  创建精灵
-            _sprite.SetCoord(0, 0, 10);
+            _sprite.SetCoord(0, 0, 15);
             _sprite.SetMesh(_meshCache.Get("res/1.wrl"));
             _sprite.SetMaterial(_materialCache.Get("res/material1"));
 		}
@@ -50,7 +51,7 @@ void AppWindow::OnMessage(UINT uint, WPARAM wparam, LPARAM lparam)
 		{
             _renderer.SetFar(2000);
             _renderer.SetLineRGB(RGB(255, 255, 255));
-            _renderer.SetDrawMode(/*Renderer::kLINE | */Renderer::kFILL | Renderer::kCOLOR);
+            _renderer.SetDrawMode(Renderer::kLINE | Renderer::kFILL | Renderer::kCOLOR);
 			_renderer.SetBufferSize(GetWidth(), GetHeight());
 			_renderer.SetViewPort(0, 0, GetWidth(), GetHeight());
 			_renderer.LookAt({ 0, 0, 0 }, { 0, 1, 0 }, { 0, 0, 1 });
