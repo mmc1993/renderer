@@ -16,12 +16,6 @@ void AppWindow::OnMessage(UINT uint, WPARAM wparam, LPARAM lparam)
 	case WM_CREATE:
 		{
 			SetTimer(GetHwnd(), 1001, 33, nullptr);
-			_cubePoint.x = 0;
-			_cubePoint.y = 0;
-			_cubePoint.z = 25;
-
-            _cubeRotateX = -0;
-            _cubeRotateY = -90;
 
             //  º”‘ÿŒ∆¿Ì
             Material material;
@@ -75,19 +69,19 @@ void AppWindow::OnRender()
 {
 	if (GetAsyncKeyState('W') != 0)
 	{
-        _root.SetRotateX(_root.GetTransform().rx + 0.1f);
+        _root.SetRotateX(_root.GetTransform().rx + 5.0f);
 	}
 	if (GetAsyncKeyState('S') != 0)
 	{
-        _root.SetRotateX(_root.GetTransform().rx - 0.1f);
+        _root.SetRotateX(_root.GetTransform().rx - 5.0f);
 	}
 	if (GetAsyncKeyState('A') != 0)
 	{
-        _root.SetRotateY(_root.GetTransform().ry + 0.1f);
+        _root.SetRotateY(_root.GetTransform().ry + 5.0f);
 	}
 	if (GetAsyncKeyState('D') != 0)
 	{
-        _root.SetRotateY(_root.GetTransform().ry - 0.1f);
+        _root.SetRotateY(_root.GetTransform().ry - 5.0f);
 	}
 
     _renderer.Clear(0, 0, 0);

@@ -95,7 +95,7 @@ public:
         return _transform;
     }
 
-    virtual void OnDraw(Renderer * renderer, const Matrix4x4 * parent = nullptr);
+    virtual void OnDraw(Renderer * renderer, const Matrix4x4 * parent = nullptr, bool isUpdate = false);
 
 private:
 

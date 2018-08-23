@@ -23,11 +23,6 @@ private:
 	void OnRender();
 
 private:
-	Vec4 _cubePoint;
-	float _cubeRotateX;
-	float _cubeRotateY;
-    
-
     Sprite _root;
     Renderer _renderer;
     MeshCache _meshCache;
