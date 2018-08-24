@@ -39,7 +39,14 @@ void AppWindow::OnMessage(UINT uint, WPARAM wparam, LPARAM lparam)
             _renderer.AddLight(pointLight);
 
             //  ╬ш╧Б╣ф
-
+            auto spotLight = new SpotLight();
+            spotLight->SetCoord(Vec4(2, 5, 14));
+            spotLight->mColor = Color(1, 1, 1);
+            spotLight->mDirect = Vec4(0, -1, 0);
+            spotLight->mInRadius = 0.99f;
+            spotLight->mOutRadius = 0.90f;
+            spotLight->mPower = 10.0f;
+            _renderer.AddLight(spotLight);
 
             //  ╪сть shader
             _shaderCache.Load<RGBShader>("rgb_shader");
