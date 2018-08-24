@@ -103,6 +103,12 @@ public:
 public:
     Renderer();
 
+    ~Renderer();
+
+    void AddLight(Light * light);
+
+    void DelLight(size_t index);
+
     void SetFar(float vfar);
 
 	void Clear(float r, float g, float b);
@@ -163,7 +169,8 @@ private:
     std::uint8_t _drawMode;
     std::uint32_t _lineRGB;
 
-    std::vector<Light *> _light;
+    //  นโิด
+    std::vector<Light *> _lights;
 
     Render _render;
 };

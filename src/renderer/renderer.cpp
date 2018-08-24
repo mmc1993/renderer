@@ -3,6 +3,25 @@
 Renderer::Renderer(): _drawMode(DrawMode::kLINE)
 { }
 
+Renderer::~Renderer()
+{
+    while (_lights.empty())
+    {
+        delete _lights.back();
+        _lights.pop_back();
+    }
+}
+
+void Renderer::AddLight(Light * light)
+{
+    _lights.push_back(light);
+}
+
+void Renderer::DelLight(size_t index)
+{
+    _lights.erase(_lights.begin() + index);
+}
+
 void Renderer::SetFar(float vfar)
 { 
     _camera.vfar = vfar;
@@ -314,6 +333,11 @@ void Renderer::FragmentShader(const Vertex & v, Color * outc)
     _render.param.outv = v.world;
     _render.param.caemraPos = _camera.eye;
     _render.material->GetShader().FragmentFunc(_render.param);
+    //  光源着色
+    for (auto & light : _lights) 
+    { 
+        light->FragmentFunc(_render.param); 
+    }
     *outc = _render.param.outc;
 }
 

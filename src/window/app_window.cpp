@@ -1,5 +1,8 @@
 #include "app_window.h"
-#include "../renderer/io/file/file.h"
+#include "../renderer/light/ambient_light.h"
+#include "../renderer/light/direct_light.h"
+#include "../renderer/light/point_light.h"
+#include "../renderer/light/spot_light.h"
 
 AppWindow::AppWindow()
 {
@@ -17,13 +20,33 @@ void AppWindow::OnMessage(UINT uint, WPARAM wparam, LPARAM lparam)
 		{
 			SetTimer(GetHwnd(), 1001, 33, nullptr);
 
+            //  环境光
+            auto ambientLight = new AmbientLight();
+            ambientLight->mColor = Color(0.3f, 0.3f, 0.3f);
+            _renderer.AddLight(ambientLight);
+
+            //  方向光
+            auto directLight = new DirectLight();
+            directLight->SetCoord(Vec4(0, 0, 0));
+            directLight->mColor = Color(1.0f, 1.0f, 1.0f);
+            _renderer.AddLight(directLight);
+
+            //  点光源
+            auto pointLight = new PointLight();
+            pointLight->SetCoord(Vec4(5, 0, 13));
+            pointLight->mColor = Color(1.0f, 1.0f, 1.0f);
+            pointLight->mPower = 5.0f;
+            _renderer.AddLight(pointLight);
+
+            //  聚光灯
+
+
             //  加载 shader
             _shaderCache.Load<RGBShader>("rgb_shader");
 
             //  加载纹理
             Material material;
             material.BindShader(_shaderCache.Get("rgb_shader"));
-
             _materialCache.Bind("res/material1", material);
 
             //  加载网格
@@ -37,14 +60,14 @@ void AppWindow::OnMessage(UINT uint, WPARAM wparam, LPARAM lparam)
             _root.SetMaterial(_materialCache.Get("res/material1"));
 
             //  创建精灵
-            for (auto i = 0; i != 1; ++i)
-            {
-                auto sprite = new Sprite();
-                sprite->SetCoord((i + 1) * 2.0f, 0, 0);
-                sprite->SetMesh(_meshCache.Get("res/3.wrl"));
-                sprite->SetMaterial(_materialCache.Get("res/material1"));
-                _root.AddChild(sprite);
-            }
+            //for (auto i = 0; i != 1; ++i)
+            //{
+            //    auto sprite = new Sprite();
+            //    sprite->SetCoord((i + 1) * 5.0f, 0, 0);
+            //    sprite->SetMesh(_meshCache.Get("res/3.wrl"));
+            //    sprite->SetMaterial(_materialCache.Get("res/material1"));
+            //    _root.AddChild(sprite);
+            //}
 		}
 		break;
 	case WM_TIMER:
