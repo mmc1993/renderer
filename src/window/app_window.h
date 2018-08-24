@@ -9,6 +9,7 @@
 #include "../renderer/renderer.h"
 #include "../renderer/shader/rgb_shader.h"
 #include "../cache/material_cache.h"
+#include "../cache/shader_cache.h"
 #include "../cache/mesh_cache.h"
 
 class AppWindow: public Window {
@@ -26,5 +27,6 @@ private:
     Sprite _root;
     Renderer _renderer;
     MeshCache _meshCache;
+    ShaderCache _shaderCache;
     MaterialCache _materialCache;
 };

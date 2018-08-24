@@ -10,6 +10,6 @@ class RGBShader : public Shader {
 
     virtual void FragmentFunc(PipelineParam & param) override
     {
-        param.outc = param.c * (param.caemraPos - param.outv).Normal().Dot(param.n);
+        param.outc = param.c/* * (param.caemraPos - param.outv).Normal().Dot(param.n)*/;
     }
 };

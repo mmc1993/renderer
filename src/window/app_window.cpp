@@ -17,9 +17,12 @@ void AppWindow::OnMessage(UINT uint, WPARAM wparam, LPARAM lparam)
 		{
 			SetTimer(GetHwnd(), 1001, 33, nullptr);
 
+            //  º”‘ÿ shader
+            _shaderCache.Load<RGBShader>("rgb_shader");
+
             //  º”‘ÿŒ∆¿Ì
             Material material;
-            material.BindShader(new RGBShader());
+            material.BindShader(_shaderCache.Get("rgb_shader"));
 
             _materialCache.Bind("res/material1", material);
 

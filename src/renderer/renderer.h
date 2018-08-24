@@ -2,6 +2,7 @@
 
 #include "../base.h"
 
+#include "light/light.h"
 #include "pipeline.h"
 #include "material.h"
 #include "matrix.h"
@@ -161,6 +162,8 @@ private:
 
     std::uint8_t _drawMode;
     std::uint32_t _lineRGB;
+
+    std::vector<Light *> _light;
 
     Render _render;
 };
