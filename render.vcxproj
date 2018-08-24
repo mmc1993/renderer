@@ -120,7 +120,6 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="src\main.cpp" />
-    <ClCompile Include="src\cache\mesh_cache.cpp" />
     <ClCompile Include="src\renderer\io\file\file.cpp" />
     <ClCompile Include="src\renderer\io\file\file_vrml.cpp" />
     <ClCompile Include="src\renderer\renderer.cpp" />
@@ -133,6 +132,7 @@
     <ClInclude Include="src\base.h" />
     <ClInclude Include="src\cache\base_cache.h" />
     <ClInclude Include="src\cache\material_cache.h" />
+    <ClInclude Include="src\cache\shader_cache.h" />
     <ClInclude Include="src\io\assets_io.h" />
     <ClInclude Include="src\cache\mesh_cache.h" />
     <ClInclude Include="src\math\matrix.h" />
@@ -141,6 +141,11 @@
     <ClInclude Include="src\renderer\color.h" />
     <ClInclude Include="src\renderer\io\file\file.h" />
     <ClInclude Include="src\renderer\io\file\file_vrml.h" />
+    <ClInclude Include="src\renderer\light\ambient_light.h" />
+    <ClInclude Include="src\renderer\light\direct_light.h" />
+    <ClInclude Include="src\renderer\light\light.h" />
+    <ClInclude Include="src\renderer\light\point_light.h" />
+    <ClInclude Include="src\renderer\light\spot_light.h" />
     <ClInclude Include="src\renderer\material.h" />
     <ClInclude Include="src\renderer\math.h" />
     <ClInclude Include="src\renderer\matrix.h" />
