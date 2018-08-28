@@ -13,7 +13,7 @@ bool FileVRML::LoadMesh(const std::string & fname, Mesh * mesh)
         for (auto i = 0; i != vrml.coordIdxs.size() / 3; ++i)
         {
             Vertex v0, v1, v2;
-            v0.coord = vrml.coords.at(vrml.coordIdxs.at(i * 3));
+            v0.coord = vrml.coords.at(vrml.coordIdxs.at(i * 3    ));
             v1.coord = vrml.coords.at(vrml.coordIdxs.at(i * 3 + 1));
             v2.coord = vrml.coords.at(vrml.coordIdxs.at(i * 3 + 2));
 
@@ -40,8 +40,8 @@ bool FileVRML::Parse(const std::string & string, VRML * output)
     for (auto i = 0; i != numbers.size(); i += 3)
     {
         //  y, x, z
-        output->coords.emplace_back(numbers.at(i + 1), 
-                                    numbers.at(i + 0), 
+        output->coords.emplace_back(numbers.at(i + 1),
+                                    -numbers.at(i + 0),
                                     -numbers.at(i + 2));
     }
 
@@ -75,8 +75,8 @@ bool FileVRML::Parse(const std::string & string, VRML * output)
     for (auto i = 0; i != numbers.size(); i += 4)
     {
         output->coordIdxs.push_back((size_t)numbers.at(i    ));
-        output->coordIdxs.push_back((size_t)numbers.at(i + 1));
         output->coordIdxs.push_back((size_t)numbers.at(i + 2));
+        output->coordIdxs.push_back((size_t)numbers.at(i + 1));
     }
 
     return true;

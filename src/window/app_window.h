@@ -24,7 +24,9 @@ private:
 	void OnRender();
 
 private:
-    Sprite _root;
+    Sprite _panle;
+    Sprite _cube;
+
     Renderer _renderer;
     MeshCache _meshCache;
     ShaderCache _shaderCache;

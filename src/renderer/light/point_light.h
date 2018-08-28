@@ -12,6 +12,7 @@ public:
         if (dot > 0 && len < mPower)
         {
             param.outc += mColor * dot * ((mPower - len) / mPower);
+            param.outc.Normal();
         }
     }
 
