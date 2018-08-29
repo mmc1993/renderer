@@ -49,14 +49,14 @@ void AppWindow::OnMessage(UINT uint, WPARAM wparam, LPARAM lparam)
             //}
 
             //  聚光灯
-            auto spotLight = new SpotLight();
-            spotLight->SetCoord(Vec4(3, 3, 8));
-            spotLight->mColor = Color(1, 1, 1);
-            spotLight->mDirect = Vec4(0, -1, 0);
-            spotLight->mInRadius = 0.90f;
-            spotLight->mOutRadius = 0.80f;
-            spotLight->mPower = 9.0f;
-            _renderer.AddLight(spotLight);
+            //auto spotLight = new SpotLight();
+            //spotLight->SetCoord(Vec4(3, 3, 8));
+            //spotLight->mColor = Color(1, 1, 1);
+            //spotLight->mDirect = Vec4(0, -1, 0);
+            //spotLight->mInRadius = 0.90f;
+            //spotLight->mOutRadius = 0.80f;
+            //spotLight->mPower = 9.0f;
+            //_renderer.AddLight(spotLight);
 
             //  加载 shader
             _shaderCache.Load<RGBShader>("rgb_shader");
@@ -70,17 +70,16 @@ void AppWindow::OnMessage(UINT uint, WPARAM wparam, LPARAM lparam)
             _meshCache.Load("res/1.wrl");
             _meshCache.Load("res/2.wrl");
             _meshCache.Load("res/3.wrl");
-            _meshCache.Load("res/4.wrl");
 
             _panle.SetRotateX(60);
             _panle.SetCoord(0, 0, 10);
-            _panle.SetMesh(_meshCache.Get("res/2.wrl"));
+            _panle.SetMesh(_meshCache.Get("res/3.wrl"));
             _panle.SetMaterial(_materialCache.Get("res/material1"));
 
-            _cube.SetRotateX(60);
-            _cube.SetCoord(0, 3, 15);
-            _cube.SetMesh(_meshCache.Get("res/2.wrl"));
-            _cube.SetMaterial(_materialCache.Get("res/material1"));
+            //_cube.SetRotateX(60);
+            //_cube.SetCoord(0, 3, 15);
+            //_cube.SetMesh(_meshCache.Get("res/2.wrl"));
+            //_cube.SetMaterial(_materialCache.Get("res/material1"));
 
             //  创建精灵
             //for (auto i = 0; i != 1; ++i)
@@ -105,7 +104,7 @@ void AppWindow::OnMessage(UINT uint, WPARAM wparam, LPARAM lparam)
 		{
             _renderer.SetFar(2000);
             _renderer.SetLineRGB(RGB(255, 255, 255));
-            _renderer.SetDrawMode(/*Renderer::kLINE | */Renderer::kFILL/* | Renderer::kCOLOR*/);
+            _renderer.SetDrawMode(Renderer::kLINE/* | Renderer::kFILL*//* | Renderer::kCOLOR*/);
 			_renderer.SetBufferSize(GetWidth(), GetHeight());
 			_renderer.SetViewPort(0, 0, GetWidth(), GetHeight());
 			_renderer.LookAt({ 0, 0, 0 }, { 0, 1, 0 }, { 0, 0, 1 });
@@ -118,35 +117,23 @@ void AppWindow::OnRender()
 {
 	if (GetAsyncKeyState('W') != 0)
 	{
-        //for (auto & sp : _sps)
-        //{
-        //    sp.SetRotateX(sp.GetTransform().rx + 5.0f);
-        //}
+        _panle.SetRotateX(_panle.GetTransform().rx + 5.0f);
 	}
 	if (GetAsyncKeyState('S') != 0)
 	{
-        //for (auto & sp : _sps)
-        //{
-        //    sp.SetRotateX(sp.GetTransform().rx - 5.0f);
-        //}
+        _panle.SetRotateX(_panle.GetTransform().rx - 5.0f);
 	}
 	if (GetAsyncKeyState('A') != 0)
 	{
-        //for (auto & sp : _sps)
-        //{
-        //    sp.SetRotateY(sp.GetTransform().ry + 5.0f);
-        //}
+        _panle.SetRotateY(_panle.GetTransform().ry + 5.0f);
 	}
 	if (GetAsyncKeyState('D') != 0)
 	{
-        //for (auto & sp : _sps)
-        //{
-        //    sp.SetRotateY(sp.GetTransform().ry - 5.0f);
-        //}
+        _panle.SetRotateY(_panle.GetTransform().ry - 5.0f);
 	}
 
     _renderer.Clear(0, 0, 0);
     _panle.OnDraw(&_renderer);
-    _cube.OnDraw(&_renderer);
+    //_cube.OnDraw(&_renderer);
     FromRenderer(_renderer);
 }
